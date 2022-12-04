@@ -57,3 +57,15 @@
   border-radius: 69px;
   background-color: var(--white-color);
 }
+
+.vh100_56 {
+  min-height: calc(100vh - var(--navbar-height));
+}
+
+.ptop_nav {
+  padding-top: var(--navbar-height);
+}
+
+.ptop_navplus {
+  padding-top: calc(var(--navbar-height) + 10px);
+}

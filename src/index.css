@@ -24,6 +24,8 @@
   --white-color: #ffffff;
   --grey-color: #c2c2c2;
   --yellow-color: #ffff33;
+
+  --navbar-height: 56px;
 }
 
 ::-webkit-scrollbar {

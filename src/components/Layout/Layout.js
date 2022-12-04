@@ -5,7 +5,7 @@ const Layout = (props) => {
   return (
     <>
       <SHNavbar />
-      <div>{props.children}</div>
+      <div className="ptop_navplus">{props.children}</div>
     </>
   );
 };
