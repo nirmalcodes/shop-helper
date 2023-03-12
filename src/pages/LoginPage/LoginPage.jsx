@@ -18,16 +18,6 @@ const LoginPage = () => {
             username: Yup.string().required('Username is required'),
             password: Yup.string().required('Password is required'),
         }),
-        // validate: (values) => {
-        //     const errors = {};
-        //     if (!values.username) {
-        //         errors.username = 'Username is required';
-        //     }
-        //     if (!values.password) {
-        //         errors.password = 'Password is required';
-        //     }
-        //     return errors;
-        // },
     });
 
     return (
@@ -55,7 +45,6 @@ const LoginPage = () => {
                                 {formik.errors.username &&
                                     formik.touched.username &&
                                     formik.errors.username}
-                                {/* Invalide Username */}
                             </div>
                         </div>
                         <div className="mb-3">
@@ -92,7 +81,6 @@ const LoginPage = () => {
                                 {formik.errors.password &&
                                     formik.touched.password &&
                                     formik.errors.password}
-                                {/* Invalide Password */}
                             </div>
                         </div>
                         <button
