@@ -45,7 +45,7 @@ const LoginPage = () => {
                                         id="username"
                                         name="username"
                                         type="text"
-                                        placeholder="jone"
+                                        placeholder="john"
                                         className="form-input"
                                     />
                                     <ErrorMessage
