@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+    [type='number']::-webkit-outer-spin-button,
+    [type='number']::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+}
+
 @layer components {
     .form-group {
         @apply mb-4;
@@ -10,7 +18,7 @@
         @apply mb-2 block text-sm font-medium text-gray-700;
     }
     .form-input {
-        @apply w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500;
+        @apply w-full appearance-none rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-300/30 disabled:text-gray-600;
     }
 
     .form-password-group {
