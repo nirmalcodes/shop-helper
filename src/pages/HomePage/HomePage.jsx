@@ -117,11 +117,6 @@ const HomePage = () => {
                                         autoComplete="off"
                                         disabled
                                     />
-                                    <ErrorMessage
-                                        name="discount"
-                                        component="span"
-                                        className="form-error-message"
-                                    />
                                 </div>
                                 <div className="form-group">
                                     <label
