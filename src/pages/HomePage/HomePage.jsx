@@ -53,15 +53,33 @@ const HomePage = () => {
             let beforBalanceAdd = productPrice - discount;
             let AfterBalanceAdd = beforBalanceAdd + balanceFromMaxCap;
             discountedPrice = AfterBalanceAdd.toFixed(2);
+            // console.log(balanceFromMaxCap);
+            // console.log(beforBalanceAdd);
+            // console.log(AfterBalanceAdd);
+            alert(
+                `Discount Value Rs. ${discount} is above Max Cap of Rs. 3000.00\nExtra Rs. ${balanceFromMaxCap.toFixed(
+                    2
+                )} is added back to the Discounted Price`
+            );
         } else {
             discountedPrice = (productPrice - discount).toFixed(2);
         }
 
+        let convenienceFeePercentage = (100 - convenienceFeeRate) / 100;
+        totalWithConvenienceFee = (
+            discountedPrice / convenienceFeePercentage
+        ).toFixed(2);
+        convenienceFee = (totalWithConvenienceFee - discountedPrice).toFixed(2);
+
+        installmentPerMonth = (totalWithConvenienceFee / 3).toFixed(2);
+
         setFieldValue('discount', discount);
         setFieldValue('discountedPrice', discountedPrice);
+        setFieldValue('convenienceFee', convenienceFee);
+        setFieldValue('totalWithConvenienceFee', totalWithConvenienceFee);
+        setFieldValue('installmentPerMonth', installmentPerMonth);
 
-        console.log(productPrice);
-
+        // console.log(productPrice);
         // console.log('onSubmit', values);
     };
 
