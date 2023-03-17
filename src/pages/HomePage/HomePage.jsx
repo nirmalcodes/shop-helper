@@ -1,15 +1,16 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 
 const HomePage = () => {
     const inputRef = useRef(null);
+    const [discountMode, setDiscountMode] = useState(true);
 
     useEffect(() => {
         const input = inputRef.current;
 
         const handleWheel = (event) => {
-            event.preventDefault(); // Prevent the default behavior of the "wheel" event
+            event.preventDefault();
         };
 
         input.addEventListener('wheel', handleWheel, { passive: false });
@@ -36,7 +37,26 @@ const HomePage = () => {
     const discountRate = 15;
     const discountMaxCap = 3000;
 
-    const onSubmit = (values, { setFieldValue }) => {
+    const handleNormalCalculation = (values, { setFieldValue }) => {
+        const productPrice = values.productPrice;
+        let convenienceFee, totalWithConvenienceFee, installmentPerMonth;
+
+        let convenienceFeePercentage = (100 - convenienceFeeRate) / 100;
+
+        totalWithConvenienceFee = (
+            productPrice / convenienceFeePercentage
+        ).toFixed(2);
+
+        convenienceFee = (totalWithConvenienceFee - productPrice).toFixed(2);
+
+        installmentPerMonth = (totalWithConvenienceFee / 3).toFixed(2);
+
+        setFieldValue('convenienceFee', convenienceFee);
+        setFieldValue('totalWithConvenienceFee', totalWithConvenienceFee);
+        setFieldValue('installmentPerMonth', installmentPerMonth);
+    };
+
+    const handleDiscountCalculation = (values, { setFieldValue }) => {
         const productPrice = values.productPrice;
         let discount,
             discountedPrice,
@@ -50,12 +70,13 @@ const HomePage = () => {
 
         if (discount > discountMaxCap) {
             let balanceFromMaxCap = discount - discountMaxCap;
+
             let beforBalanceAdd = productPrice - discount;
+
             let AfterBalanceAdd = beforBalanceAdd + balanceFromMaxCap;
+
             discountedPrice = AfterBalanceAdd.toFixed(2);
-            // console.log(balanceFromMaxCap);
-            // console.log(beforBalanceAdd);
-            // console.log(AfterBalanceAdd);
+
             alert(
                 `Discount Value Rs. ${discount} is above Max Cap of Rs. 3000.00\nExtra Rs. ${balanceFromMaxCap.toFixed(
                     2
@@ -66,9 +87,11 @@ const HomePage = () => {
         }
 
         let convenienceFeePercentage = (100 - convenienceFeeRate) / 100;
+
         totalWithConvenienceFee = (
             discountedPrice / convenienceFeePercentage
         ).toFixed(2);
+
         convenienceFee = (totalWithConvenienceFee - discountedPrice).toFixed(2);
 
         installmentPerMonth = (totalWithConvenienceFee / 3).toFixed(2);
@@ -78,19 +101,32 @@ const HomePage = () => {
         setFieldValue('convenienceFee', convenienceFee);
         setFieldValue('totalWithConvenienceFee', totalWithConvenienceFee);
         setFieldValue('installmentPerMonth', installmentPerMonth);
-
-        // console.log(productPrice);
-        // console.log('onSubmit', values);
     };
 
     return (
         <>
             <div className="mx-auto grid min-h-screen place-items-center px-4 xl:w-[70%]">
                 <div className="w-full max-w-[420px] rounded-lg bg-white px-4 py-8 drop-shadow-md">
+                    <div className="mb-4 flex items-center gap-2">
+                        <input
+                            type="checkbox"
+                            name="discount"
+                            id="discount"
+                            checked={discountMode}
+                            onChange={(e) => setDiscountMode(e.target.checked)}
+                        />
+                        <label htmlFor="discount">
+                            Discount mode {discountMode ? 'ON' : 'OFF'}
+                        </label>
+                    </div>
                     <Formik
                         initialValues={initialValues}
                         validationSchema={validationSchema}
-                        onSubmit={onSubmit}
+                        onSubmit={
+                            discountMode
+                                ? handleDiscountCalculation
+                                : handleNormalCalculation
+                        }
                     >
                         {() => (
                             <Form>
@@ -119,40 +155,46 @@ const HomePage = () => {
                                         className="form-error-message"
                                     />
                                 </div>
-                                <div className="form-group">
-                                    <label
-                                        htmlFor="discount"
-                                        className="form-label"
-                                    >
-                                        Discount
-                                    </label>
-                                    <Field
-                                        id="discount"
-                                        name="discount"
-                                        type="number"
-                                        placeholder="00.00"
-                                        className="form-input"
-                                        autoComplete="off"
-                                        disabled
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label
-                                        htmlFor="discountedPrice"
-                                        className="form-label"
-                                    >
-                                        Discounted Price
-                                    </label>
-                                    <Field
-                                        id="discountedPrice"
-                                        name="discountedPrice"
-                                        type="number"
-                                        placeholder="00.00"
-                                        className="form-input"
-                                        autoComplete="off"
-                                        disabled
-                                    />
-                                </div>
+
+                                {discountMode && (
+                                    <>
+                                        <div className="form-group">
+                                            <label
+                                                htmlFor="discount"
+                                                className="form-label"
+                                            >
+                                                Discount
+                                            </label>
+                                            <Field
+                                                id="discount"
+                                                name="discount"
+                                                type="number"
+                                                placeholder="00.00"
+                                                className="form-input"
+                                                autoComplete="off"
+                                                disabled
+                                            />
+                                        </div>
+                                        <div className="form-group">
+                                            <label
+                                                htmlFor="discountedPrice"
+                                                className="form-label"
+                                            >
+                                                Discounted Price
+                                            </label>
+                                            <Field
+                                                id="discountedPrice"
+                                                name="discountedPrice"
+                                                type="number"
+                                                placeholder="00.00"
+                                                className="form-input"
+                                                autoComplete="off"
+                                                disabled
+                                            />
+                                        </div>
+                                    </>
+                                )}
+
                                 <div className="form-group">
                                     <label
                                         htmlFor="convenienceFee"
