@@ -1,10 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import { db } from '../../firebaseConfig';
+import { doc, getDoc, onSnapshot } from 'firebase/firestore';
 
 const HomePage = () => {
     const inputRef = useRef(null);
-    const [discountMode, setDiscountMode] = useState(true);
+    const [convenienceFeeRate, setConvenienceFeeRate] = useState(3);
+    const [discountMode, setDiscountMode] = useState(false);
+    const [discountRate, setDiscountRate] = useState(0);
+    const [discountMaxCap, setDiscountMaxCap] = useState(0);
 
     useEffect(() => {
         const input = inputRef.current;
@@ -15,8 +20,25 @@ const HomePage = () => {
 
         input.addEventListener('wheel', handleWheel, { passive: false });
 
+        const configDoc = doc(db, 'config', 'config');
+
+        const getDocument = async (documentId) => {
+            const documentRef = doc(db, 'config', documentId);
+            const documentSnapshot = await getDoc(documentRef);
+            if (documentSnapshot.exists()) {
+                const docData = documentSnapshot.data();
+                setConvenienceFeeRate(docData.cFeeRate);
+                setDiscountMode(docData.isDiscounted);
+                setDiscountRate(docData.offerRate);
+                setDiscountMaxCap(docData.offerMaxCap);
+            } else {
+                console.log('No such document!');
+            }
+        };
+
         return () => {
             input.removeEventListener('wheel', handleWheel);
+            getDocument('config');
         };
     }, []);
 
@@ -33,9 +55,9 @@ const HomePage = () => {
         productPrice: Yup.number().required('Product Price is required'),
     });
 
-    const convenienceFeeRate = 6;
-    const discountRate = 15;
-    const discountMaxCap = 3000;
+    // const convenienceFeeRate = 6;
+    // const discountRate = 15;
+    // const discountMaxCap = 3000;
 
     const handleNormalCalculation = (values, { setFieldValue }) => {
         const productPrice = values.productPrice;
@@ -106,6 +128,10 @@ const HomePage = () => {
     return (
         <>
             <div className="mx-auto grid min-h-screen place-items-center px-4 xl:w-[70%]">
+                {convenienceFeeRate} <br />
+                {discountMode ? 'Y' : 'N'} <br />
+                {discountRate} <br />
+                {discountMaxCap} <br />
                 <div className="w-full max-w-[420px] rounded-lg bg-white px-4 py-8 drop-shadow-md">
                     <div className="mb-4 flex items-center gap-2">
                         <input
