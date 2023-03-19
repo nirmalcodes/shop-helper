@@ -20,25 +20,29 @@ const HomePage = () => {
 
         input.addEventListener('wheel', handleWheel, { passive: false });
 
-        const getDocument = async (documentId) => {
-            const documentRef = doc(db, 'config', documentId);
+        const configDocRef = doc(db, 'config', 'config');
+        const unsubscribe = onSnapshot(configDocRef, (doc) => {
+            console.log('Config data:', doc.data());
+            const configData = doc.data();
 
-            const documentSnapshot = await getDoc(documentRef);
+            setConvenienceFeeRate(configData.cFeeRate);
 
-            if (documentSnapshot.exists()) {
-                const docData = documentSnapshot.data();
-                setConvenienceFeeRate(docData.cFeeRate);
-                setDiscountMode(docData.isDiscounted);
-                setDiscountRate(docData.offerRate);
-                setDiscountMaxCap(docData.offerMaxCap);
+            setDiscountMode(configData.isDiscounted);
+
+            if (configData.isDiscounted) {
+                setDiscountRate(configData.offerRate);
+
+                setDiscountMaxCap(configData.offerMaxCap);
             } else {
-                console.log('No such document!');
+                setDiscountRate(0);
+
+                setDiscountMaxCap(0);
             }
-        };
+        });
 
         return () => {
             input.removeEventListener('wheel', handleWheel);
-            getDocument('config');
+            unsubscribe();
         };
     }, []);
 
