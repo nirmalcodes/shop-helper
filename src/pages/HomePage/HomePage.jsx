@@ -21,23 +21,16 @@ const HomePage = () => {
         input.addEventListener('wheel', handleWheel, { passive: false });
 
         const configDocRef = doc(db, 'config', 'config');
+
         const unsubscribe = onSnapshot(configDocRef, (doc) => {
+            const { cFeeRate, isDiscounted, offerRate, offerMaxCap } =
+                doc.data();
             console.log('Config data:', doc.data());
-            const configData = doc.data();
 
-            setConvenienceFeeRate(configData.cFeeRate);
-
-            setDiscountMode(configData.isDiscounted);
-
-            if (configData.isDiscounted) {
-                setDiscountRate(configData.offerRate);
-
-                setDiscountMaxCap(configData.offerMaxCap);
-            } else {
-                setDiscountRate(0);
-
-                setDiscountMaxCap(0);
-            }
+            setConvenienceFeeRate(cFeeRate);
+            setDiscountMode(isDiscounted);
+            setDiscountRate(isDiscounted ? offerRate : 0);
+            setDiscountMaxCap(isDiscounted ? offerMaxCap : 0);
         });
 
         return () => {
