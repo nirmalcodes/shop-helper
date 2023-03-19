@@ -20,11 +20,11 @@ const HomePage = () => {
 
         input.addEventListener('wheel', handleWheel, { passive: false });
 
-        const configDoc = doc(db, 'config', 'config');
-
         const getDocument = async (documentId) => {
             const documentRef = doc(db, 'config', documentId);
+
             const documentSnapshot = await getDoc(documentRef);
+
             if (documentSnapshot.exists()) {
                 const docData = documentSnapshot.data();
                 setConvenienceFeeRate(docData.cFeeRate);
