@@ -2,7 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { db } from '../../firebaseConfig';
-import { doc, getDoc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const HomePage = () => {
     const inputRef = useRef(null);
@@ -28,9 +30,16 @@ const HomePage = () => {
             console.log('Config data:', doc.data());
 
             setConvenienceFeeRate(cFeeRate);
+            // {
+            //     isDiscounted
+            //         ? toast.success('Discount mode is ON now')
+            //         : toast.warn('Discount mode is OFF now');
+            // }
             setDiscountMode(isDiscounted);
             setDiscountRate(isDiscounted ? offerRate : 0);
             setDiscountMaxCap(isDiscounted ? offerMaxCap : 0);
+
+            // toast.success('Config data updated!');
         });
 
         return () => {
@@ -51,10 +60,6 @@ const HomePage = () => {
     const validationSchema = Yup.object({
         productPrice: Yup.number().required('Product Price is required'),
     });
-
-    // const convenienceFeeRate = 6;
-    // const discountRate = 15;
-    // const discountMaxCap = 3000;
 
     const handleNormalCalculation = (values, { setFieldValue }) => {
         const productPrice = values.productPrice;
@@ -124,19 +129,29 @@ const HomePage = () => {
 
     return (
         <>
-            <div className="mx-auto grid min-h-screen place-items-center px-4 xl:w-[70%]">
-                {convenienceFeeRate} <br />
-                {discountMode ? 'Y' : 'N'} <br />
-                {discountRate} <br />
-                {discountMaxCap} <br />
+            <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="dark"
+                className=""
+            />
+            <div className="mx-auto grid min-h-screen place-items-center xl:w-[70%]">
                 <div className="w-full max-w-[420px] rounded-lg bg-white px-4 py-8 drop-shadow-md">
                     <div className="mb-4 flex items-center gap-2">
                         <input
                             type="checkbox"
                             name="discount"
                             id="discount"
+                            className=""
                             checked={discountMode}
-                            onChange={(e) => setDiscountMode(e.target.checked)}
+                            disabled
                         />
                         <label htmlFor="discount">
                             Discount mode {discountMode ? 'ON' : 'OFF'}
