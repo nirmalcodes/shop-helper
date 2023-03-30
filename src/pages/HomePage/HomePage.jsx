@@ -29,15 +29,16 @@ const HomePage = () => {
                 doc.data();
             console.log('Config data:', doc.data());
 
-            setConvenienceFeeRate(cFeeRate);
-            // {
-            //     isDiscounted
-            //         ? toast.success('Discount mode is ON now')
-            //         : toast.warn('Discount mode is OFF now');
-            // }
             setDiscountMode(isDiscounted);
             setDiscountRate(isDiscounted ? offerRate : 0);
             setDiscountMaxCap(isDiscounted ? offerMaxCap : 0);
+            setConvenienceFeeRate(cFeeRate);
+
+            // {
+            //     isDiscounted
+            //         ? toast.success('Discount mode is ON')
+            //         : toast.warn('Discount mode is OFF');
+            // }
 
             // toast.success('Config data updated!');
         });
