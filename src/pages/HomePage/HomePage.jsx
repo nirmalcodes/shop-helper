@@ -169,7 +169,7 @@ const HomePage = () => {
                     >
                         {() => (
                             <Form>
-                                <h4 className="mb-4 text-center text-2xl font-medium text-gray-700">
+                                <h4 className="mb-8 text-center text-2xl font-medium text-gray-700">
                                     KOKO
                                 </h4>
                                 <div className="form-group">
