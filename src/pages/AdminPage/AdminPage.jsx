@@ -47,15 +47,8 @@ const AdminPage = () => {
             console.log('Config data:', doc.data());
 
             setDiscountMode(isDiscounted);
-            // setDiscountRate(isDiscounted ? offerRate : 0);
-            // setDiscountMaxCap(isDiscounted ? offerMaxCap : 0);
             setConvenienceFeeRate(cFeeRate);
         });
-
-        // return () => {
-        //     input.removeEventListener('wheel', handleWheel);
-        //     unsubscribe();
-        // };
 
         return () => {
             inputRefs.forEach((inputRef) => {
@@ -69,12 +62,10 @@ const AdminPage = () => {
     }, [discountMode]);
 
     const initialValues = {
-        productPrice: '',
-        discount: '',
-        discountedPrice: '',
-        convenienceFee: '',
-        totalWithConvenienceFee: '',
-        installmentPerMonth: '',
+        convenienceFeeRate: '',
+        discountMode: '',
+        discountRate: '',
+        discountMaxCap: '',
     };
 
     const validationSchema = Yup.object({
@@ -111,19 +102,20 @@ const AdminPage = () => {
                     >
                         {() => (
                             <Form>
-                                <h4 className="mb-4 text-center text-2xl font-medium text-gray-700">
+                                <h4 className="mb-8 text-center text-2xl font-medium text-gray-700">
                                     KOKO Configuration
                                 </h4>
+
                                 <div className="form-group">
                                     <label
-                                        htmlFor="productPrice"
+                                        htmlFor="convenienceFeeRate"
                                         className="form-label"
                                     >
-                                        Convenience Fee
+                                        Convenience Fee Rate
                                     </label>
                                     <Field
-                                        id="productPrice"
-                                        name="productPrice"
+                                        id="convenienceFeeRate"
+                                        name="convenienceFeeRate"
                                         type="number"
                                         placeholder="3"
                                         className="form-input"
@@ -131,26 +123,59 @@ const AdminPage = () => {
                                         innerRef={inputRefs[0]}
                                     />
                                     <ErrorMessage
-                                        name="productPrice"
+                                        name="convenienceFeeRate"
                                         component="span"
                                         className="form-error-message"
                                     />
                                 </div>
 
-                                {discountMode && (
+                                <div className="form-group">
+                                    <label
+                                        htmlFor="discountMode"
+                                        className="form-label"
+                                    >
+                                        Discount Mode
+                                    </label>
+
+                                    <Switch
+                                        id="discountMode"
+                                        name="discountMode"
+                                        checked={enabled}
+                                        onChange={setEnabled}
+                                        className={`${
+                                            enabled
+                                                ? 'bg-green-600'
+                                                : 'bg-gray-300'
+                                        } relative inline-flex h-[38px] w-[74px] shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75`}
+                                    >
+                                        <span className="sr-only">
+                                            Discount mode ON/OFF
+                                        </span>
+                                        <span
+                                            aria-hidden="true"
+                                            className={`${
+                                                enabled
+                                                    ? 'translate-x-9'
+                                                    : 'translate-x-0'
+                                            } pointer-events-none inline-block h-[34px] w-[34px] transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out`}
+                                        />
+                                    </Switch>
+                                </div>
+
+                                {enabled && (
                                     <>
                                         <div className="form-group">
                                             <label
-                                                htmlFor="discount"
+                                                htmlFor="discountRate"
                                                 className="form-label"
                                             >
                                                 Discount Rate
                                             </label>
                                             <Field
-                                                id="discount"
-                                                name="discount"
+                                                id="discountRate"
+                                                name="discountRate"
                                                 type="number"
-                                                placeholder="00.00"
+                                                placeholder="10"
                                                 className="form-input"
                                                 autoComplete="off"
                                                 innerRef={inputRefs[1]}
@@ -158,16 +183,16 @@ const AdminPage = () => {
                                         </div>
                                         <div className="form-group">
                                             <label
-                                                htmlFor="discountedPrice"
+                                                htmlFor="discountMaxCap"
                                                 className="form-label"
                                             >
-                                                Discounted Price
+                                                Discount Max Cap
                                             </label>
                                             <Field
-                                                id="discountedPrice"
-                                                name="discountedPrice"
+                                                id="discountMaxCap"
+                                                name="discountMaxCap"
                                                 type="number"
-                                                placeholder="00.00"
+                                                placeholder="2000"
                                                 className="form-input"
                                                 autoComplete="off"
                                                 innerRef={inputRefs[2]}
@@ -175,24 +200,6 @@ const AdminPage = () => {
                                         </div>
                                     </>
                                 )}
-
-                                <Switch
-                                    checked={enabled}
-                                    onChange={setEnabled}
-                                    className={`${
-                                        enabled ? 'bg-green-600' : 'bg-gray-300'
-                                    } relative inline-flex h-[38px] w-[74px] shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75`}
-                                >
-                                    <span className="sr-only">Use setting</span>
-                                    <span
-                                        aria-hidden="true"
-                                        className={`${
-                                            enabled
-                                                ? 'translate-x-9'
-                                                : 'translate-x-0'
-                                        } pointer-events-none inline-block h-[34px] w-[34px] transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out`}
-                                    />
-                                </Switch>
 
                                 <button
                                     type="submit"
