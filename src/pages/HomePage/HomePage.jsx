@@ -22,17 +22,17 @@ const HomePage = () => {
 
         input.addEventListener('wheel', handleWheel, { passive: false });
 
-        const configDocRef = doc(db, 'config', 'config');
+        const configDocRef = doc(db, 'configs', 'configData');
 
         const unsubscribe = onSnapshot(configDocRef, (doc) => {
-            const { cFeeRate, isDiscounted, offerRate, offerMaxCap } =
+            const { feeRate, discount, discountRate, discountMaxCap } =
                 doc.data();
-            console.log('Config data:', doc.data());
+            // console.log('Config data:', doc.data());
 
-            setDiscountMode(isDiscounted);
-            setDiscountRate(isDiscounted ? offerRate : 0);
-            setDiscountMaxCap(isDiscounted ? offerMaxCap : 0);
-            setConvenienceFeeRate(cFeeRate);
+            setDiscountMode(discount);
+            setDiscountRate(discount ? discountRate : 0);
+            setDiscountMaxCap(discount ? discountMaxCap : 0);
+            setConvenienceFeeRate(feeRate);
 
             // {
             //     isDiscounted
@@ -102,8 +102,10 @@ const HomePage = () => {
 
             discountedPrice = AfterBalanceAdd.toFixed(2);
 
+            const fixedMaxCap = discountMaxCap.toFixed(2);
+
             alert(
-                `Discount Value Rs. ${discount} is above Max Cap of Rs. 3000.00\nExtra Rs. ${balanceFromMaxCap.toFixed(
+                `Discount Value Rs. ${discount} is above Max Cap of Rs. ${fixedMaxCap}\nExtra Rs. ${balanceFromMaxCap.toFixed(
                     2
                 )} is added back to the Discounted Price`
             );
