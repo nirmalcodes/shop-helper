@@ -127,7 +127,6 @@ const AdminPage = () => {
                 draggable
                 pauseOnHover
                 theme="dark"
-                className=""
             />
             <div className="mx-auto grid min-h-screen place-items-center xl:w-[70%]">
                 <div className="w-full max-w-[420px] rounded-lg bg-white px-4 py-8 drop-shadow-md">
