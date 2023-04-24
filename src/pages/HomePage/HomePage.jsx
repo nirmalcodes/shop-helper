@@ -5,6 +5,8 @@ import { db } from '../../firebaseConfig';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
 
 const HomePage = () => {
     const inputRef = useRef(null);
@@ -12,6 +14,8 @@ const HomePage = () => {
     const [discountMode, setDiscountMode] = useState(false);
     const [discountRate, setDiscountRate] = useState(0);
     const [discountMaxCap, setDiscountMaxCap] = useState(0);
+
+    const MySwal = withReactContent(Swal);
 
     useEffect(() => {
         const input = inputRef.current;
@@ -104,11 +108,14 @@ const HomePage = () => {
 
             const fixedMaxCap = discountMaxCap.toFixed(2);
 
-            alert(
-                `Discount Value Rs. ${discount} is above Max Cap of Rs. ${fixedMaxCap}\nExtra Rs. ${balanceFromMaxCap.toFixed(
+            MySwal.fire({
+                title: `Discount Value Rs. ${discount} is above Max Cap of Rs. ${fixedMaxCap}`,
+                text: `Extra Rs. ${balanceFromMaxCap.toFixed(
                     2
-                )} is added back to the Discounted Price`
-            );
+                )} is added back to the Discounted Price`,
+                icon: 'warning',
+                confirmButtonText: 'OK',
+            });
         } else {
             discountedPrice = (productPrice - discount).toFixed(2);
         }
@@ -145,7 +152,7 @@ const HomePage = () => {
                 theme="dark"
                 className=""
             />
-            <div className="mx-auto grid min-h-screen place-items-center xl:w-[70%]">
+            <div className="m-4 grid min-h-screen place-items-center xl:mx-auto xl:w-[70%]">
                 <div className="w-full max-w-[420px] rounded-lg bg-white px-4 py-8 drop-shadow-md">
                     <div className="mb-4 flex items-center gap-2">
                         <input
@@ -270,7 +277,7 @@ const HomePage = () => {
                                         disabled
                                     />
                                 </div>
-                                <div className="form-group">
+                                <div className="form-group mb-8">
                                     <label
                                         htmlFor="installmentPerMonth"
                                         className="form-label"
@@ -289,7 +296,7 @@ const HomePage = () => {
                                 </div>
                                 <button
                                     type="submit"
-                                    className="btn btn-primary mb-4"
+                                    className="btn btn-primary"
                                 >
                                     Calculate
                                 </button>
