@@ -2,11 +2,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as Yup from 'yup';
 import { Switch } from '@headlessui/react';
 import { db } from '../../firebaseConfig';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, onSnapshot, setDoc } from 'firebase/firestore';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { UserAuth } from '../../context/AuthContext';
 
 const AdminPage = () => {
+    const { user, logOut } = UserAuth();
     const inputRefs = [useRef(null), useRef(null), useRef(null)];
 
     const [convenienceFee, setConvenienceFee] = useState('');
@@ -45,31 +47,46 @@ const AdminPage = () => {
     }, [discountMode]);
 
     useEffect(() => {
+        const configDocRef = doc(db, 'configs', 'configData');
+
+        const unsubscribe = onSnapshot(configDocRef, (doc) => {
+            const { feeRate, discount, discountRate, discountMaxCap } =
+                doc.data();
+
+            // console.log('Config data:', doc.data());
+
+            setConvenienceFee(feeRate);
+            setDiscountMode(discount);
+            setDiscountRate(discountRate);
+            setDiscountMaxCap(discountMaxCap);
+        });
+
         const configRef = doc(db, 'configs', 'configData');
 
-        const fetchData = async () => {
-            const docSnap = await getDoc(configRef);
+        // const fetchData = async () => {
+        //     const docSnap = await getDoc(configRef);
 
-            try {
-                if (docSnap.exists()) {
-                    // console.log('Document data:', docSnap.data());
+        //     try {
+        //         if (docSnap.exists()) {
+        //             // console.log('Document data:', docSnap.data());
 
-                    const data = docSnap.data();
+        //             const data = docSnap.data();
 
-                    setConvenienceFee(data.feeRate);
-                    setDiscountMode(data.discount);
-                    setDiscountRate(data.discountRate);
-                    setDiscountMaxCap(data.discountMaxCap);
-                } else {
-                    // console.warn('No such document!');
-                }
-            } catch (error) {
-                // console.error('Error fetching data:', error);
-            }
-        };
+        //             setConvenienceFee(data.feeRate);
+        //             setDiscountMode(data.discount);
+        //             setDiscountRate(data.discountRate);
+        //             setDiscountMaxCap(data.discountMaxCap);
+        //         } else {
+        //             // console.warn('No such document!');
+        //         }
+        //     } catch (error) {
+        //         // console.error('Error fetching data:', error);
+        //     }
+        // };
 
         return () => {
-            fetchData();
+            // fetchData();
+            unsubscribe();
         };
     }, []);
 
@@ -109,9 +126,19 @@ const AdminPage = () => {
             toast.success('Data saved successfully!');
         } catch (error) {
             // console.error('Error saving form data:', error);
+            if (error.code === 'permission-denied') {
+                // console.log('Write permission denied\n Only admins can write to this document');
+                toast.error('Only admins can write to this document');
+            } else {
+                // console.log('Write failed: ', error);
+            }
         }
 
         setIsLoading(false);
+    };
+
+    const handleSignOut = () => {
+        logOut();
     };
 
     return (
@@ -128,7 +155,7 @@ const AdminPage = () => {
                 pauseOnHover
                 theme="dark"
             />
-            <div className="mx-auto grid min-h-screen place-items-center xl:w-[70%]">
+            <div className="mx-4 grid min-h-screen place-items-center xl:mx-auto xl:w-[70%]">
                 <div className="w-full max-w-[420px] rounded-lg bg-white px-4 py-8 drop-shadow-md">
                     <form onSubmit={handleSubmit}>
                         <h4 className="mb-8 text-center text-2xl font-medium text-gray-700">
@@ -244,10 +271,22 @@ const AdminPage = () => {
                         >
                             {isLoading ? 'Saving...' : 'Save'}
                         </button>
-                        {formError && <p>{formError}</p>}
+                        {formError && (
+                            <p className="form-error-message">{formError}</p>
+                        )}
                     </form>
                 </div>
             </div>
+
+            {user != null && (
+                <button
+                    className="btn btn-primary absolute top-4 right-4 z-[4] w-max"
+                    type="submit"
+                    onClick={handleSignOut}
+                >
+                    Log Out
+                </button>
+            )}
         </>
     );
 };
