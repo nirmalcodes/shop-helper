@@ -2,9 +2,12 @@ import React, { useState } from 'react';
 import { BsEye, BsEyeSlash } from 'react-icons/bs';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import { UserAuth } from '../../context/AuthContext';
 
 const LoginPage = () => {
     const [passwordToggled, setPasswordToggled] = useState(false);
+
+    const { googleSignIn, emailSignIn, user, logOut } = UserAuth();
 
     const initialValues = {
         username: '',
@@ -17,7 +20,20 @@ const LoginPage = () => {
     });
 
     const onSubmit = (values) => {
-        console.log('onSubmit', values);
+        // console.log('onSubmit', values);
+
+        const email = values.username;
+        const password = values.password;
+
+        emailSignIn(email, password);
+    };
+
+    const handleSignIn = () => {
+        googleSignIn();
+    };
+
+    const handleSignOut = () => {
+        logOut();
     };
 
     return (
@@ -104,6 +120,15 @@ const LoginPage = () => {
                         )}
                     </Formik>
                 </div>
+                {user != null && (
+                    <button
+                        type="submit"
+                        className="btn btn-primary mb-4"
+                        onClick={handleSignOut}
+                    >
+                        signOut
+                    </button>
+                )}
             </div>
         </>
     );
