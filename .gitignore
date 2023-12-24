@@ -26,6 +26,4 @@ dist-ssr
 *.cache
 .env
 .env.development
-firebase.json
 .firebase/
-.firebaserc
