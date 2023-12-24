@@ -1,7 +1,12 @@
 import { auth } from './firebase'
-import { createUserWithEmailAndPassword } from '@firebase/auth'
+import {
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut,
+    updatePassword,
+} from '@firebase/auth'
 
-export const registerUser = async (email, password) => {
+export const signUpWithEmail = async (email, password) => {
     try {
         const userCredential = await createUserWithEmailAndPassword(
             auth,
@@ -11,13 +16,13 @@ export const registerUser = async (email, password) => {
         return userCredential.user
     } catch (error) {
         console.error('Error registering user:', error)
-        // Add custom error handling here
     }
 }
 
-export const signIn = async (email, password) => {
+export const signInWithEmail = async (email, password) => {
     try {
-        const userCredential = await auth.signInWithEmailAndPassword(
+        const userCredential = await signInWithEmailAndPassword(
+            auth,
             email,
             password
         )
@@ -28,21 +33,21 @@ export const signIn = async (email, password) => {
     }
 }
 
-export const signOut = async () => {
+export const updateUserPassword = async (newPassword) => {
     try {
-        await auth.signOut()
+        const user = auth.currentUser
+        await updatePassword(user, newPassword)
     } catch (error) {
-        console.error('Error signing out:', error)
+        console.error('Error updating password:', error)
         // Add custom error handling here
     }
 }
 
-export const updatePassword = async (newPassword) => {
+export const signOutUser = async () => {
     try {
-        const user = auth.currentUser
-        await user.updatePassword(newPassword)
+        await signOut(auth)
     } catch (error) {
-        console.error('Error updating password:', error)
+        console.error('Error signing out:', error)
         // Add custom error handling here
     }
 }
