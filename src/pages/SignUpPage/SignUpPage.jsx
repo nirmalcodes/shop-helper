@@ -1,13 +1,12 @@
 import React, { useContext, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router'
-// import { registerUser } from '../../services/firebase/auth'
 import { AuthContext } from '../../contexts/AuthContext'
 
 const SignUpPage = () => {
     const { user, emailSignUp } = useContext(AuthContext)
 
     if (user) {
-        return <Navigate to={'/home'} replace />
+        return <Navigate to={'/'} replace />
     }
 
     const [email, setEmail] = useState('')
@@ -15,21 +14,10 @@ const SignUpPage = () => {
 
     const navigate = useNavigate()
 
-    // const handleSignup = async (e) => {
-    //     e.preventDefault()
-    //     try {
-    //         const user = await registerUser(email, password)
-    //         console.log('Sign Up Successful', user.email)
-    //         navigate('/home')
-    //     } catch (error) {
-    //         console.log('Sign Up failed', error)
-    //     }
-    // }
-
     const handleSignup = async (e) => {
         e.preventDefault()
         await emailSignUp(email, password)
-        // navigate('/home')
+        // navigate('/')
     }
 
     return (
