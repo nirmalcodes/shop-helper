@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react'
 import { AuthContext } from '../../contexts/AuthContext'
-import { Navigate, useNavigate } from 'react-router'
+import { Navigate } from 'react-router'
 import { FaEye, FaEyeSlash } from 'react-icons/fa6'
 import { validateForm } from '../../utils/helpers/validators/SignInUpFormValidator'
 
@@ -11,26 +11,31 @@ const SignInPage = () => {
         return <Navigate to={'/'} replace />
     }
 
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-
-    const [isToggled, setIstoggled] = useState(false)
-
     const [formData, setFormData] = useState({
         email: '',
         password: '',
     })
+    const [isToggled, setIstoggled] = useState(false)
+    const [errors, setErrors] = useState({})
 
-    const navigate = useNavigate()
-
-    const handleSignIn = async (e) => {
-        e.preventDefault()
-        await emailSignIn(email, password)
-        // navigate('/')
+    const handleChange = (event) => {
+        setFormData({ ...formData, [event.target.name]: event.target.value })
+        setErrors({})
     }
 
     const togglePassword = () => {
         setIstoggled((prev) => !prev)
+    }
+
+    const handleSignIn = async (e) => {
+        e.preventDefault()
+
+        const validationErrors = validateForm(formData)
+        setErrors(validationErrors)
+
+        if (Object.keys(validationErrors).length === 0) {
+            await emailSignIn(formData.email, formData.password)
+        }
     }
 
     return (
@@ -44,7 +49,7 @@ const SignInPage = () => {
                 className="w-full max-w-[360px] rounded-lg bg-white p-4 shadow-md"
             >
                 <h4 className="mb-4 text-center text-2xl font-medium text-gray-700">
-                    Log in
+                    Log In
                 </h4>
                 <div className="mb-3">
                     <label
@@ -59,14 +64,18 @@ const SignInPage = () => {
                         type="email"
                         name="email"
                         id="eamil"
+                        value={formData.email}
+                        onChange={handleChange}
                         required
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
                         className={
                             'w-full appearance-none rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-300/30 disabled:text-gray-600'
                         }
                     />
-                    <span className="text-sm text-red-600">Error Message</span>
+                    {errors.email && (
+                        <span className="text-sm text-red-600">
+                            {errors.email}
+                        </span>
+                    )}
                 </div>
                 <div className="mb-8">
                     <label
@@ -82,9 +91,9 @@ const SignInPage = () => {
                             type={isToggled ? 'text' : 'password'}
                             name="password"
                             id="password"
+                            value={formData.password}
+                            onChange={handleChange}
                             required
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
                             className={
                                 'w-full appearance-none rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-300/30 disabled:text-gray-600'
                             }
@@ -99,7 +108,11 @@ const SignInPage = () => {
                             {isToggled ? <FaEyeSlash /> : <FaEye />}
                         </button>
                     </div>
-                    <span className="text-sm text-red-600">Error Message</span>
+                    {errors.password && (
+                        <span className="text-sm text-red-600">
+                            {errors.password}
+                        </span>
+                    )}
                 </div>
                 <button
                     type="submit"
@@ -107,7 +120,7 @@ const SignInPage = () => {
                         'flex w-full justify-center rounded-lg border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium  text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:bg-indigo-700'
                     }
                 >
-                    Sign In
+                    Log In
                 </button>
             </form>
         </div>
