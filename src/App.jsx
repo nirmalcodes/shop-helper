@@ -8,26 +8,30 @@ import { ProtectedRoute } from './components'
 const App = () => {
     return (
         <>
-            <div className="relative flex min-h-screen flex-col overflow-hidden bg-[#f1f1f1]">
+            <div className="relative flex min-h-screen flex-col overflow-hidden bg-[#FAFBFF]">
                 <Suspense>
                     <ErrorBoundary
                         fallback={<div>Something went wrong...</div>}
                     >
                         <AuthProvider>
                             <Routes>
-                                <Route path={'/'} element={<SignUpPage />} />
                                 <Route
-                                    path={'/home'}
+                                    path={'/signin'}
+                                    element={<SignInPage />}
+                                />
+                                <Route
+                                    path={'/signup'}
+                                    element={<SignUpPage />}
+                                />
+                                <Route
+                                    path={'/'}
                                     element={
                                         <ProtectedRoute>
                                             <HomePage />
                                         </ProtectedRoute>
                                     }
                                 />
-                                <Route
-                                    path={'/login'}
-                                    element={<SignInPage />}
-                                />
+
                                 <Route
                                     path={'*'}
                                     element={<div>404 Page Not Found</div>}
