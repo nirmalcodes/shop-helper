@@ -23,8 +23,25 @@ const App = () => {
                                     path={'/signup'}
                                     element={<SignUpPage />}
                                 />
+
                                 <Route
                                     path={'/'}
+                                    element={
+                                        <ProtectedRoute>
+                                            <HomePage />
+                                        </ProtectedRoute>
+                                    }
+                                />
+                                <Route
+                                    path={'/koko'}
+                                    element={
+                                        <ProtectedRoute>
+                                            <HomePage />
+                                        </ProtectedRoute>
+                                    }
+                                />
+                                <Route
+                                    path={'/updates'}
                                     element={
                                         <ProtectedRoute>
                                             <HomePage />
