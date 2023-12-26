@@ -1,11 +1,9 @@
 import React, { useContext } from 'react'
 import { FaRegHandshake } from 'react-icons/fa6'
 import { NavLink } from 'react-router-dom'
-import { FaLink } from 'react-icons/fa'
-import { FaHouse } from 'react-icons/fa6'
 import { RoutesContext } from '../../../contexts/RoutesContext'
 
-const Sidebar = ({ links = [], open = true }) => {
+const Sidebar = ({ open = true }) => {
     const { routes } = useContext(RoutesContext)
 
     return (
