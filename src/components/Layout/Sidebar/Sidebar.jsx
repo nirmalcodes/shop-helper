@@ -1,9 +1,13 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { FaRegHandshake } from 'react-icons/fa6'
 import { NavLink } from 'react-router-dom'
 import { FaLink } from 'react-icons/fa'
+import { FaHouse } from 'react-icons/fa6'
+import { RoutesContext } from '../../../contexts/RoutesContext'
 
 const Sidebar = ({ links = [], open = true }) => {
+    const { routes } = useContext(RoutesContext)
+
     return (
         <>
             <aside className={`sidebar ${open && 'open'}`}>
@@ -16,37 +20,22 @@ const Sidebar = ({ links = [], open = true }) => {
                     )}
                 </div>
 
-                <nav
-                    className="p-2"
-                    style={{
-                        height: `calc(100vh - ${'56px'})`,
-                    }}
-                >
+                <nav className="h-[calc(100vh_-_56px)] max-h-[calc(100vh_-_56px)] overflow-hidden overflow-y-auto p-2">
                     <ul className="flex flex-shrink-0 flex-col gap-y-3">
-                        <li className="">
-                            <NavLink to={'/'} className={'sidebar-link'}>
-                                <FaLink />
-                                <span className="text-sm leading-none">
-                                    Home
-                                </span>
-                            </NavLink>
-                        </li>
-                        <li className="">
-                            <NavLink to={'/koko'} className={'sidebar-link'}>
-                                <FaLink />
-                                <span className="text-sm leading-none">
-                                    KOKO
-                                </span>
-                            </NavLink>
-                        </li>
-                        <li className="">
-                            <NavLink to={'/updates'} className={'sidebar-link'}>
-                                <FaLink />
-                                <span className="text-sm leading-none">
-                                    Updates
-                                </span>
-                            </NavLink>
-                        </li>
+                        {routes.map((route) => (
+                            <li key={route?.id}>
+                                <NavLink
+                                    to={route?.path}
+                                    className={'sidebar-link'}
+                                >
+                                    {route?.icon && <route.icon />}
+
+                                    <span className="text-[0.8125rem] font-medium leading-none">
+                                        {route?.name}
+                                    </span>
+                                </NavLink>
+                            </li>
+                        ))}
                     </ul>
                 </nav>
             </aside>
