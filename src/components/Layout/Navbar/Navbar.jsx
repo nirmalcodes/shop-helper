@@ -1,9 +1,16 @@
-import React from 'react'
-import { FaBars } from 'react-icons/fa6'
+import React, { useContext } from 'react'
+import { FaBars, FaArrowRightFromBracket } from 'react-icons/fa6'
+import { AuthContext } from '../../../contexts/AuthContext'
 
 const Navbar = ({ toggleOpen }) => {
+    const { user, logOut } = useContext(AuthContext)
+
     const toggleSidebar = () => {
         toggleOpen((prev) => !prev)
+    }
+
+    const handleLogOut = async () => {
+        await logOut()
     }
 
     return (
@@ -16,8 +23,17 @@ const Navbar = ({ toggleOpen }) => {
                 >
                     <FaBars />
                 </button>
-                <div className="ml-auto">
-                    <button type="button">log</button>
+                <div className="ml-auto flex items-center gap-x-4">
+                    <p className="">{user?.email}</p>
+                    <button
+                        type="button"
+                        onClick={handleLogOut}
+                        className={
+                            'flex w-full justify-center rounded-lg border border-transparent bg-indigo-600 p-2 text-xl font-medium  text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:bg-indigo-700'
+                        }
+                    >
+                        <FaArrowRightFromBracket />
+                    </button>
                 </div>
             </header>
         </>
