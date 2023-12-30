@@ -12,11 +12,11 @@
     }
 
     .navbar {
-        @apply fixed left-0 right-0 top-0 flex h-14 w-full items-center border-b bg-white px-4 py-3 transition-all duration-300 ease-in lg:left-[78px] lg:w-[calc(100%_-_78px)];
+        @apply fixed left-0 right-0 top-0 z-[99999] flex h-14 w-full items-center border-b bg-white px-4 py-3 transition-all duration-300 ease-in lg:left-[78px] lg:w-[calc(100%_-_78px)];
     }
 
     .content {
-        @apply absolute left-0 top-[56px] h-[calc(100vh_-_56px)] w-full px-4 py-2 transition-all duration-300 ease-in lg:left-[78px] lg:w-[calc(100%_-_78px)];
+        @apply absolute left-0 top-[56px] min-h-[calc(100vh_-_56px)] w-full bg-[#FAFBFF] px-4 py-5 transition-all duration-300 ease-in lg:left-[78px] lg:w-[calc(100%_-_78px)];
     }
 
     .sidebar.open ~ .navbar,
@@ -25,7 +25,7 @@
     }
 
     .sidebar-link {
-        @apply flex h-[62px] w-[62px] flex-col text-2xl items-center justify-center gap-1 rounded-md border bg-[#FAFBFF] p-1 transition-all duration-300 ease-in hover:bg-indigo-500 hover:text-white hover:shadow-md;
+        @apply flex h-[62px] w-[62px] flex-col items-center justify-center gap-1 rounded-md border bg-[#FAFBFF] p-1 text-2xl transition-all duration-300 ease-in hover:bg-indigo-500 hover:text-white hover:shadow-md;
     }
 
     .sidebar.open .sidebar-link {
@@ -33,6 +33,10 @@
     }
 
     .sidebar-link.active {
-        @apply bg-indigo-500 text-white shadow-md;
+        @apply bg-indigo-600 text-white shadow-md;
+    }
+
+    .container {
+        @apply mx-auto w-full lg:w-[85%] xl:w-[90%];
     }
 }
