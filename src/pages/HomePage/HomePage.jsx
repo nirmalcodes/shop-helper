@@ -1,21 +1,16 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import { AuthContext } from '../../contexts/AuthContext'
 import { FaCalculator } from 'react-icons/fa6'
-import { StatCard } from '../../components'
+import { StatCard, UpdatesCard } from '../../components'
 
 const HomePage = () => {
     const { user, logOut } = useContext(AuthContext)
-
-    const handleLogOut = async () => {
-        await logOut()
-    }
-
-    const statCard = {
-        id: 1,
+    const [statCard, setStatCard] = useState({
         name: 'KOKO Calc Mode',
         value: 'Default',
         icon: FaCalculator,
-    }
+    })
+    const [updates, setUpdates] = useState([])
 
     return (
         <>
@@ -30,20 +25,15 @@ const HomePage = () => {
                         </h3>
                         <hr />
                         <div className="flex flex-col gap-y-4 py-5">
-                            <div className="rounded-md bg-white p-4 shadow-md">
-                                <h5 className="mb-2 text-lg font-semibold text-slate-700">
-                                    Test
-                                </h5>
-                                <p className="w-full md:w-[85%] lg:w-[80%] xl:w-[65%]">
-                                    Lorem ipsum dolor, sit amet consectetur
-                                    adipisicing elit. Exercitationem minima
-                                    veritatis maxime laboriosam. Tenetur
-                                    assumenda architecto est perferendis
-                                    deleniti, veritatis ipsa rerum laboriosam
-                                    magnam laudantium ratione aliquam culpa
-                                    dicta quam!
-                                </p>
-                            </div>
+                            {updates && updates.length > 0 ? (
+                                updates.map((update) => (
+                                    <UpdatesCard data={update} />
+                                ))
+                            ) : (
+                                <div className="grid min-h-[100px] place-items-center font-medium text-slate-500/50">
+                                    No Updates to show
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
