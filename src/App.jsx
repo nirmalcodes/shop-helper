@@ -21,11 +21,11 @@ const App = () => {
                         <RoutesProvider>
                             <Routes>
                                 <Route
-                                    path={'/signin'}
+                                    path={'signin'}
                                     element={<SignInPage />}
                                 />
                                 <Route
-                                    path={'/signup'}
+                                    path={'signup'}
                                     element={<SignUpPage />}
                                 />
 
@@ -38,7 +38,7 @@ const App = () => {
                                     }
                                 />
                                 <Route
-                                    path={'/koko'}
+                                    path={'koko'}
                                     element={
                                         <ProtectedRoute>
                                             <KOKOPage />
@@ -46,7 +46,7 @@ const App = () => {
                                     }
                                 />
                                 <Route
-                                    path={'/updates'}
+                                    path={'updates'}
                                     element={
                                         <ProtectedRoute>
                                             <UpdatesPage />
