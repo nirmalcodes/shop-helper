@@ -41,7 +41,7 @@ const SignInPage = () => {
     return (
         <div
             className={
-                'flex w-full flex-1 flex-col items-center justify-center p-4'
+                'flex min-h-screen w-full flex-1 flex-col items-center justify-center p-5'
             }
         >
             <form
