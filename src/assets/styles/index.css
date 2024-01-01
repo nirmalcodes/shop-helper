@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type='number'] {
+    -moz-appearance: textfield;
+}
+
 @layer components {
     .sidebar {
         @apply fixed left-0 top-0 h-screen w-0 overflow-hidden border-r bg-white transition-all duration-300 ease-in lg:w-[78px];
@@ -25,7 +35,7 @@
     }
 
     .sidebar-link {
-        @apply flex h-[62px] w-[62px] flex-col items-center justify-center gap-1 rounded-md border bg-[#FAFBFF] p-1 text-2xl transition-all duration-300 ease-in hover:bg-indigo-500 hover:text-white hover:shadow-md;
+        @apply flex h-[62px] w-[62px] flex-col items-center justify-center gap-1 rounded-md border bg-[#FAFBFF] p-1 text-2xl transition-all duration-300 ease-in hover:bg-indigo-600 hover:text-white hover:shadow-md;
     }
 
     .sidebar.open .sidebar-link {
@@ -33,7 +43,7 @@
     }
 
     .sidebar-link.active {
-        @apply bg-indigo-600 text-white shadow-md;
+        @apply bg-indigo-600 text-white shadow-md hover:bg-indigo-600/95;
     }
 
     .container {
