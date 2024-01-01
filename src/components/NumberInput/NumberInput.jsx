@@ -3,8 +3,9 @@ import React, { useEffect, useRef } from 'react'
 const NumberInput = ({
     id,
     label = 'Label',
-    placeholder = '0000.00',
-    errorMssg = false,
+    placeholder = 'Enter Number',
+    errorMssg = '',
+    ...rest
 }) => {
     const inputRef = useRef(null)
 
@@ -24,25 +25,33 @@ const NumberInput = ({
 
     return (
         <>
-            <div className="form-group">
-                <label htmlFor={id} className="form-label">
-                    {label}
-                </label>
-                <input
-                    type="number"
-                    id={id}
+            <label
+                htmlFor={id}
+                className={
+                    'mb-2 block flex-[1] text-sm font-medium text-slate-700 md:inline-block'
+                }
+            >
+                {label}
+            </label>
+            <input
+                type="number"
+                inputMode="numeric"
+                id={id}
+                name={id}
+                placeholder={placeholder}
+                className="h-min w-full appearance-none rounded-lg border-gray-300 shadow-sm focus:border-indigo-600 focus:ring-indigo-600 disabled:bg-gray-300/30 disabled:text-gray-600 md:w-fit md:flex-[2]"
+                autoComplete="off"
+                ref={inputRef}
+                {...rest}
+            />
+            {errorMssg && (
+                <span
                     name={id}
-                    placeholder={placeholder}
-                    className="form-input"
-                    autoComplete="off"
-                    ref={inputRef}
-                />
-                {errorMssg && (
-                    <span name={id} className="">
-                        helper text
-                    </span>
-                )}
-            </div>
+                    className="inline-block text-sm font-medium text-red-500"
+                >
+                    helper text
+                </span>
+            )}
         </>
     )
 }
