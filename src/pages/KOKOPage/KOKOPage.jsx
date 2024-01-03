@@ -9,6 +9,11 @@ const KOKOPage = () => {
     const [convenienceFeeRate, setConvenienceFeeRate] = useState(6)
     const [discountMode, setDiscountMode] = useState(false)
 
+    const [errors, setErrors] = useState({
+        productPriceError: '',
+        deliveryFeeError: '',
+    })
+
     const [formData, setFormData] = useState({
         productPrice: '',
         deliveryFee: '',
@@ -16,6 +21,7 @@ const KOKOPage = () => {
         totalWithConvenienceFee: '',
         installmentPerMonth: '',
     })
+
     const [calculatedData, setCalculatedData] = useState({
         productPrice: '',
         deliveryFee: '',
@@ -26,18 +32,14 @@ const KOKOPage = () => {
 
     const [showCopyBtn, setShowCopyBtn] = useState(false)
 
-    // Function to update a specific field in the formData state
-    const updateFormData = (fieldName, value) => {
-        setFormData((prevFormData) => ({
-            ...prevFormData,
-            [fieldName]: value,
-        }))
-    }
-
     // Function to handle input field changes
     const handleInputChange = (e) => {
         const { name, value } = e.target
-        updateFormData(name, value)
+        setFormData((prevFormData) => ({
+            ...prevFormData,
+            [name]: value,
+        }))
+        setErrors({})
     }
 
     const handleCalculation = (e) => {
@@ -50,9 +52,26 @@ const KOKOPage = () => {
         // Define constants
         let convenienFeePercentage = (100 - convenienceFeeRate) / 100
 
-        // Validate product price
-        if (isNaN(productPrice)) {
-            console.error('Invalid product price')
+        // Validate form inputs
+        if (formData.productPrice === '') {
+            setErrors((prevErrors) => ({
+                ...prevErrors,
+                productPriceError: 'Enter Product Price.',
+            }))
+            return
+        }
+        if (isNaN(productPrice) || productPrice < 0) {
+            setErrors((prevErrors) => ({
+                ...prevErrors,
+                productPriceError: 'Invalid Value.',
+            }))
+            return
+        }
+        if (isNaN(deliveryFee) || deliveryFee < 0) {
+            setErrors((prevErrors) => ({
+                ...prevErrors,
+                deliveryFeeError: 'Invalid Delivery Fee.',
+            }))
             return
         }
 
@@ -84,7 +103,7 @@ const KOKOPage = () => {
         })
 
         // Set showCopyBtn
-        setShowCopyBtn(!showCopyBtn)
+        setShowCopyBtn(true)
     }
 
     // Function for copy to clipboard (old way)
@@ -134,6 +153,7 @@ const KOKOPage = () => {
             <div className="container">
                 <form
                     onSubmit={handleCalculation}
+                    autoComplete="off"
                     className="mx-0 w-full max-w-[650px] rounded-lg bg-white px-4 py-8 shadow-md md:mx-auto lg:mx-0"
                 >
                     {/* Logo and Calc Status */}
@@ -153,71 +173,132 @@ const KOKOPage = () => {
                     </div>
 
                     {/* Inputs & Outputs */}
-                    <div className="mb-3 flex-wrap items-center md:mb-4 md:flex md:gap-x-4 lg:mb-5">
-                        <NumberInput
-                            id={'productPrice'}
-                            label="Product Price"
-                            value={formData.productPrice}
-                            onChange={handleInputChange}
-                            required
-                        />
-                    </div>
-
-                    <div className="mb-3 flex-wrap items-center md:mb-4 md:flex md:gap-x-4 lg:mb-5">
-                        <NumberInput
-                            id={'deliveryFee'}
-                            label="Delivery Fee"
-                            value={formData.deliveryFee}
-                            onChange={handleInputChange}
-                        />
-                    </div>
-
-                    <div className="mb-3 flex-wrap items-center md:mb-4 md:flex md:gap-x-4 lg:mb-5">
-                        <NumberInput
-                            id={'convenienceFee'}
-                            label="Convenience Fee"
-                            value={formData.convenienceFee}
-                            disabled
-                        />
-                    </div>
-                    <div className="mb-3 flex-wrap items-center md:mb-4 md:flex md:gap-x-4 lg:mb-5">
-                        <NumberInput
-                            id={'totalWithConvenienceFee'}
-                            label="Total with Convenience Fee"
-                            value={formData.totalWithConvenienceFee}
-                            disabled
-                        />
-                    </div>
-                    <div className="mb-6 flex-wrap items-center md:mb-4 md:flex md:gap-x-4 lg:mb-5">
-                        <NumberInput
-                            id={'installmentPerMonth'}
-                            label="Installment Per Month"
-                            value={formData.installmentPerMonth}
-                            disabled
-                        />
-                    </div>
-
-                    <div className="flex w-full flex-col-reverse items-center gap-4 md:flex-row md:flex-wrap">
-                        {!showCopyBtn && <div className="flex-1" />}
-                        {showCopyBtn && (
-                            <button
-                                type="button"
-                                className={
-                                    'flex w-full justify-center rounded-lg border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-sm  hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:bg-green-700 md:flex-1'
-                                }
-                                onClick={handleCopyToClipboard}
-                            >
-                                Copy to Clipboard
-                            </button>
-                        )}
-                        <button
-                            type="submit"
-                            className={
-                                'flex w-full justify-center rounded-lg border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm  hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:bg-indigo-700 md:flex-1'
-                            }
+                    <div className="form-group flex-wrap md:flex">
+                        <label
+                            htmlFor="productPrice"
+                            className="form-label mb-2 text-sm font-medium text-slate-700 md:mb-0 md:w-1/3 md:px-4"
                         >
-                            Calculate
-                        </button>
+                            Product Price
+                        </label>
+                        <div className="md:w-4/6 md:px-4">
+                            <NumberInput
+                                name="productPrice"
+                                id="productPrice"
+                                placeholder="Enter Product Price"
+                                autoComplete="off"
+                                className="form-input"
+                                autoFocus
+                                value={formData.productPrice}
+                                onChange={handleInputChange}
+                                // required
+                            />
+                            {errors.productPriceError && (
+                                <span className="helper-text error-mssg text-sm font-medium">
+                                    {errors.productPriceError}
+                                </span>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="form-group flex-wrap md:flex">
+                        <label
+                            htmlFor="deliveryFee"
+                            className="form-label mb-2 text-sm font-medium text-slate-700 md:mb-0 md:w-1/3 md:px-4"
+                        >
+                            Delivery Fee
+                        </label>
+                        <div className="md:w-4/6 md:px-4">
+                            <NumberInput
+                                name="deliveryFee"
+                                id="deliveryFee"
+                                placeholder="Enter Delivery Fee"
+                                autoComplete="off"
+                                className="form-input"
+                                value={formData.deliveryFee}
+                                onChange={handleInputChange}
+                            />
+                            {errors.deliveryFeeError && (
+                                <span className="helper-text error-mssg text-sm font-medium">
+                                    {errors.deliveryFeeError}
+                                </span>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="form-group flex-wrap md:flex">
+                        <label
+                            htmlFor="convenienceFee"
+                            className="form-label mb-2 text-sm font-medium text-slate-700 md:mb-0 md:w-1/3 md:px-4"
+                        >
+                            Convenience Fee
+                        </label>
+                        <div className="md:w-4/6 md:px-4">
+                            <NumberInput
+                                name="convenienceFee"
+                                id="convenienceFee"
+                                className="form-input"
+                                value={formData.convenienceFee}
+                                disabled
+                            />
+                        </div>
+                    </div>
+
+                    <div className="form-group flex-wrap md:flex">
+                        <label
+                            htmlFor="totalWithConvenienceFee"
+                            className="form-label mb-2 text-sm font-medium text-slate-700 md:mb-0 md:w-1/3 md:px-4"
+                        >
+                            Total with Convenience Fee
+                        </label>
+                        <div className="md:w-4/6 md:px-4">
+                            <NumberInput
+                                name="totalWithConvenienceFee"
+                                id="totalWithConvenienceFee"
+                                className="form-input"
+                                value={formData.totalWithConvenienceFee}
+                                disabled
+                            />
+                        </div>
+                    </div>
+
+                    <div className="form-group flex-wrap md:flex">
+                        <label
+                            htmlFor="installmentPerMonth"
+                            className="form-label mb-2 text-sm font-medium text-slate-700 md:mb-0 md:w-1/3 md:px-4"
+                        >
+                            Installment Per Month
+                        </label>
+                        <div className="md:w-4/6 md:px-4">
+                            <NumberInput
+                                name="installmentPerMonth"
+                                id="installmentPerMonth"
+                                className="form-input"
+                                value={formData.installmentPerMonth}
+                                disabled
+                            />
+                        </div>
+                    </div>
+
+                    <div className="mt-12 flex flex-col-reverse gap-y-3 md:flex-row md:flex-wrap">
+                        {showCopyBtn && (
+                            <div className="md:w-1/2 md:px-4">
+                                <button
+                                    type="button"
+                                    className="flex w-full justify-center rounded-lg border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-sm  hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:bg-green-700 md:flex-1"
+                                    onClick={handleCopyToClipboard}
+                                >
+                                    Copy to Clipboard
+                                </button>
+                            </div>
+                        )}
+                        <div className="md:ml-auto md:w-1/2 md:px-4">
+                            <button
+                                type="submit"
+                                className="flex w-full justify-center rounded-lg border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm  hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:bg-indigo-700 md:flex-1"
+                            >
+                                Calculate
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
