@@ -284,7 +284,7 @@ const KOKOPage = () => {
                             <div className="md:w-1/2 md:px-4">
                                 <button
                                     type="button"
-                                    className="flex w-full justify-center rounded-lg border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-sm  hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:bg-green-700 md:flex-1"
+                                    className="flex w-full justify-center rounded-lg border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-sm  hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2 disabled:bg-green-700"
                                     onClick={handleCopyToClipboard}
                                 >
                                     Copy to Clipboard
@@ -294,7 +294,7 @@ const KOKOPage = () => {
                         <div className="md:ml-auto md:w-1/2 md:px-4">
                             <button
                                 type="submit"
-                                className="flex w-full justify-center rounded-lg border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm  hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:bg-indigo-700 md:flex-1"
+                                className="flex w-full justify-center rounded-lg border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm  hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 disabled:bg-indigo-700"
                             >
                                 Calculate
                             </button>
