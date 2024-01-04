@@ -47,7 +47,7 @@ input[type='number'] {
     }
 
     .container {
-        @apply mx-auto w-full lg:w-[85%] xl:w-[90%];
+        @apply mx-auto w-full lg:w-[95%] xl:w-[90%];
     }
 
     .form-group {
