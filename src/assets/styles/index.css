@@ -14,7 +14,7 @@ input[type='number'] {
 
 @layer components {
     .sidebar {
-        @apply fixed left-0 top-0 h-screen w-0 overflow-hidden border-r bg-white transition-all duration-300 ease-in lg:w-[78px];
+        @apply fixed left-0 top-0 z-[9999] h-screen w-0 overflow-hidden border-r bg-white transition-all duration-300 ease-in lg:w-[78px];
     }
 
     .sidebar.open {
@@ -22,7 +22,7 @@ input[type='number'] {
     }
 
     .navbar {
-        @apply fixed left-0 right-0 top-0 z-[99999] flex h-14 w-full items-center border-b bg-white px-4 py-3 transition-all duration-300 ease-in lg:left-[78px] lg:w-[calc(100%_-_78px)];
+        @apply fixed left-0 right-0 top-0 z-[9999] flex h-14 w-full items-center border-b bg-white px-4 py-3 transition-all duration-300 ease-in lg:left-[78px] lg:w-[calc(100%_-_78px)];
     }
 
     .content {
