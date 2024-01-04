@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
-import { Route, Routes } from 'react-router'
+import { Route, Routes } from 'react-router-dom'
 import {
     HomePage,
     KOKOPage,
