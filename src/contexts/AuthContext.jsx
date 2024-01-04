@@ -11,16 +11,30 @@ import {
 export const AuthContext = createContext()
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null)
+    // const [user, setUser] = useState(null)
+    const [user, setUser] = useState(
+        sessionStorage.getItem('user')
+            ? JSON.parse(sessionStorage.getItem('user'))
+            : null
+    )
+
+    // useEffect(() => {
+    //     const unsubscribe = onAuthStateChanged(auth, (user) => {
+    //         setUser(user)
+    //     })
+
+    //     return () => {
+    //         unsubscribe()
+    //     }
+    // }, [])
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
+            sessionStorage.setItem('user', JSON.stringify(user))
             setUser(user)
         })
 
-        return () => {
-            unsubscribe()
-        }
+        return () => unsubscribe()
     }, [])
 
     const emailSignIn = async (email, password) => {
@@ -54,6 +68,7 @@ export const AuthProvider = ({ children }) => {
     const logOut = async () => {
         try {
             await signOutUser()
+            sessionStorage.removeItem('user') // Clear user state from localStorage
             setUser(null)
         } catch (error) {
             // Handle sign-out error
