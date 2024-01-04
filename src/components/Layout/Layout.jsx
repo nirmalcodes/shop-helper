@@ -8,7 +8,7 @@ const Layout = ({ children }) => {
     return (
         <>
             <div className="relative flex min-h-screen flex-col text-slate-700">
-                <Sidebar open={isOpen} />
+                <Sidebar open={isOpen} toggleOpen={setIsOpen} />
                 <Navbar toggleOpen={setIsOpen} />
                 <main className="content">{children}</main>
             </div>
