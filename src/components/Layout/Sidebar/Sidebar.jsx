@@ -3,8 +3,12 @@ import { FaRegHandshake } from 'react-icons/fa6'
 import { NavLink } from 'react-router-dom'
 import { RoutesContext } from '../../../contexts/RoutesContext'
 
-const Sidebar = ({ open = true }) => {
+const Sidebar = ({ open = true, toggleOpen }) => {
     const { routes } = useContext(RoutesContext)
+
+    const toggleSidebar = () => {
+        toggleOpen(false)
+    }
 
     return (
         <>
@@ -21,7 +25,7 @@ const Sidebar = ({ open = true }) => {
                 <nav className="h-[calc(100vh_-_56px)] max-h-[calc(100vh_-_56px)] overflow-hidden overflow-y-auto p-2">
                     <ul className="flex flex-shrink-0 flex-col gap-y-3">
                         {routes.map((route) => (
-                            <li key={route?.id}>
+                            <li key={route?.id} onClick={toggleSidebar}>
                                 <NavLink
                                     to={route?.path}
                                     className={'sidebar-link'}
