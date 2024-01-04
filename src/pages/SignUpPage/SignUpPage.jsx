@@ -1,15 +1,20 @@
 import React, { useContext, useState } from 'react'
 import { AuthContext } from '../../contexts/AuthContext'
-import { Navigate } from 'react-router'
+import { Navigate, useLocation } from 'react-router-dom'
 import { FaEye, FaEyeSlash } from 'react-icons/fa6'
 import { validateForm } from '../../utils/helpers/validators/SignInUpFormValidator'
 
 const SignUpPage = () => {
     const { user, emailSignUp } = useContext(AuthContext)
+    const location = useLocation()
 
-    if (user) {
+    if (user && location.pathname !== '/') {
         return <Navigate to={'/'} replace />
     }
+
+    // if (user) {
+    //     return <Navigate to={'/'} replace />
+    // }
 
     const [formData, setFormData] = useState({
         email: '',
