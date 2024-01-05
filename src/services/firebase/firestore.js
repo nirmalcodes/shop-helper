@@ -1,9 +1,9 @@
 import { firestore } from './firebase'
 import {
     collection,
-    getDocs,
     addDoc,
     setDoc,
+    getDocs,
     updateDoc,
     deleteDoc,
 } from 'firebase/firestore'
