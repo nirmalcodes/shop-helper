@@ -1,97 +1,83 @@
 import { firestore } from './firebase'
 import {
-    getFirestore,
     collection,
-    doc,
     getDocs,
     addDoc,
-    getDoc,
+    setDoc,
     updateDoc,
     deleteDoc,
-    query,
-    onSnapshot,
 } from 'firebase/firestore'
 
-// Access a Firestore instance from your initialized Firebase app
-const firestore = getFirestore(firebaseApp)
-
-// Function to get all documents from a collection
-export const getDocs = async (collectionName) => {
-    try {
-        const snapshot = await getDocs(collection(firestore, collectionName))
-        const docs = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
-        return docs
-    } catch (error) {
-        console.error('Error getting documents:', error)
-    }
+export const getCollectionRef = (collectionName) => {
+    return collection(firestore, collectionName)
 }
 
-// Function to add a document to a collection
-export const addDoc = async (collectionName, data) => {
+export const addDocument = async (collectionName, data) => {
     try {
-        const docRef = await addDoc(collection(firestore, collectionName), data)
-        console.log('Document added:', docRef.id)
-        return docRef.id // Return the new document ID
+        const collectionRef = getCollectionRef(collectionName)
+        const docRef = await addDoc(collectionRef, data)
+        return docRef.id
     } catch (error) {
         console.error('Error adding document:', error)
     }
 }
 
-// Function to get a single document by ID
-export const getDoc = async (collectionName, docId) => {
+export const addDocumentWithCustomId = async (
+    collectionName,
+    customId,
+    data
+) => {
     try {
-        const doc = await getDoc(doc(firestore, collectionName, docId))
-        if (doc.exists) {
-            return doc.data()
+        const collectionRef = getCollectionRef(collectionName)
+        const docRef = doc(collectionRef, customId)
+        await setDoc(docRef, data)
+    } catch (error) {
+        console.error('Error adding document with custom ID:', error)
+    }
+}
+
+export const getAllDocuments = async (collectionName) => {
+    try {
+        const collectionRef = getCollectionRef(collectionName)
+        const querySnapshot = await getDocs(collectionRef)
+        const documents = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+        }))
+        return documents
+    } catch (error) {
+        console.error('Error fetching documents:', error)
+    }
+}
+
+export const getDocumentById = async (collectionName, id) => {
+    try {
+        const collectionRef = getCollectionRef(collectionName)
+        const docSnapshot = await getDocs(collectionRef.doc(id)).get()
+        if (docSnapshot.exists()) {
+            return docSnapshot.data()
         } else {
-            console.log('Document does not exist')
+            return null // Or throw an error if document not found
         }
     } catch (error) {
         console.error('Error getting document:', error)
     }
 }
 
-// Function to update a document
-export const updateDoc = async (collectionName, docId, data) => {
+export const updateDocument = async (collectionName, id, data) => {
     try {
-        await updateDoc(doc(firestore, collectionName, docId), data)
-        console.log('Document updated')
+        const collectionRef = getCollectionRef(collectionName)
+        await updateDoc(collectionRef.doc(id), data)
     } catch (error) {
         console.error('Error updating document:', error)
     }
 }
 
-// Function to delete a document
-export const deleteDoc = async (collectionName, docId) => {
+export const deleteDocument = async (collectionName, id) => {
     try {
-        await deleteDoc(doc(firestore, collectionName, docId))
-        console.log('Document deleted')
+        const collectionRef = getCollectionRef(collectionName)
+        await deleteDoc(collectionRef.doc(id))
     } catch (error) {
         console.error('Error deleting document:', error)
     }
-}
-
-// Function to query documents based on conditions
-export const queryDocs = async (collectionName, queryConditions) => {
-    try {
-        const querySnapshot = await getDocs(
-            query(collection(firestore, collectionName), queryConditions)
-        )
-        const docs = querySnapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-        }))
-        return docs
-    } catch (error) {
-        console.error('Error querying documents:', error)
-    }
-}
-
-// Function to listen for realtime updates
-export const onSnapshot = (collectionName, callback) => {
-    const unsubscribe = onSnapshot(
-        collection(firestore, collectionName),
-        callback
-    )
-    // Call unsubscribe() to stop listening for updates
 }
