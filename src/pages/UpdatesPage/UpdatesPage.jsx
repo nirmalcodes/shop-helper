@@ -28,7 +28,7 @@ const UpdatesPage = () => {
             >
                 <FaPlus className="text-4xl" />
             </button>
-            <Modal />
+            <Modal title={'Add New Update'}/>
         </>
     )
 }
