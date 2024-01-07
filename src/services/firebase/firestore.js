@@ -6,6 +6,7 @@ import {
     getDocs,
     updateDoc,
     deleteDoc,
+    doc,
 } from 'firebase/firestore'
 
 export const getCollectionRef = (collectionName) => {
