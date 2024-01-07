@@ -2,7 +2,7 @@ import React, { Fragment, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 
 const Modal = ({ title = 'Title', children }) => {
-    const [isOpen, setIsOpen] = useState(true)
+    const [isOpen, setIsOpen] = useState(false)
 
     const closeModal = () => {
         setIsOpen(false)
@@ -18,7 +18,8 @@ const Modal = ({ title = 'Title', children }) => {
                 <Dialog
                     as="div"
                     className="relative z-[99999]"
-                    onClose={closeModal}
+                    onClose={() => {}}
+                    // onClose={closeModal}
                 >
                     <Transition.Child
                         as={Fragment}
@@ -63,9 +64,17 @@ const Modal = ({ title = 'Title', children }) => {
                                                     autoComplete="off"
                                                     autoFocus
                                                 ></textarea>
-                                                <span className="helper-text error-mssg text-sm font-medium">
-                                                    error_mssg
-                                                </span>
+                                            </div>
+                                            <div className="">
+                                                <label htmlFor="attachFiles">
+                                                    Attach Files
+                                                </label>
+                                                <input
+                                                    type="file"
+                                                    name="attachFiles"
+                                                    id="attachFiles"
+                                                    className="file"
+                                                />
                                             </div>
                                         </form>
                                     </div>
