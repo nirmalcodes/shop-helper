@@ -26,7 +26,7 @@ input[type='number'] {
     }
 
     .content {
-        @apply absolute left-0 top-[56px] min-h-[calc(100vh_-_56px)] w-full bg-[#FAFBFF] px-4 py-5 transition-all duration-300 ease-in lg:left-[78px] lg:w-[calc(100%_-_78px)];
+        @apply absolute left-0 top-[56px] flex min-h-[calc(100vh_-_56px)] w-full flex-col bg-[#FAFBFF] px-4 py-5 transition-all duration-300 ease-in lg:left-[78px] lg:w-[calc(100%_-_78px)];
     }
 
     .sidebar.open ~ .navbar,
@@ -69,4 +69,23 @@ input[type='number'] {
     .error-mssg {
         @apply text-red-500;
     }
+}
+
+.scroll-area::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+.scroll-area::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* Handle */
+.scroll-area::-webkit-scrollbar-thumb {
+    background: #c0c0c0;
+    border-radius: 5px;
+}
+
+/* Handle on hover */
+.scroll-area::-webkit-scrollbar-thumb:hover {
+    background: #b1b1b1;
 }
