@@ -1,10 +1,12 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { Modal, UpdatesCard } from '../../components'
 import { FaPlus, FaPaperPlane } from 'react-icons/fa6'
 import { auth, firestore, storage } from '../../services/firebase/firebase'
 import {
     addDoc,
     collection,
+    getDocs,
+    orderBy,
+    query,
     serverTimestamp,
     updateDoc,
 } from '@firebase/firestore'
@@ -20,6 +22,7 @@ const UpdatesPage = () => {
         message: '',
         fileAttachments: [],
     })
+    const [updates, setUpdates] = useState([])
 
     useLayoutEffect(() => {
         const containerEl = containerRef.current
@@ -132,10 +135,7 @@ const UpdatesPage = () => {
             const docRef = await addDoc(updatesCollectionRef, docData)
 
             // Update the added doc with the docID field
-            await updateDoc(docRef, { docID: docRef.id })
-
-            // Clear form data
-            setFormData({ message: '', fileAttachments: [] })
+            // await updateDoc(docRef, { docID: docRef.id })
 
             console.log('Document written with ID: ', docRef.id)
 
@@ -167,6 +167,9 @@ const UpdatesPage = () => {
             // Updated the added doc with URLs for attached files
             await updateDoc(docRef, { fileAttachments: attachmentURLs })
 
+            // Clear form data
+            setFormData({ message: '', fileAttachments: [] })
+
             alert('Update message sent successfully!')
         } catch (error) {
             console.error('Error sending message:', error)
@@ -174,31 +177,64 @@ const UpdatesPage = () => {
         }
     }
 
+    // Function to fetch all documents from the "updates" collection
+    const fetchUpdates = async () => {
+        try {
+            // "desc" For descending order
+            // "asc" For ascending order
+            const q = query(updatesCollectionRef, orderBy('createdAt', 'asc'))
+            const querySnapshot = await getDocs(q)
+            const updatesData = querySnapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+            }))
+            setUpdates(updatesData)
+        } catch (error) {
+            console.error('Error fetching messages:', error)
+        }
+    }
+
+    useEffect(() => {
+        fetchUpdates()
+    }, [])
+
     return (
         <>
             <div
-                className="scroll-area container relative flex-1 overflow-hidden overflow-y-auto scroll-smooth pb-[60px]"
+                className="scroll-area container relative flex-1 overflow-hidden overflow-y-auto scroll-smooth bg-green-300/0 px-4 pb-[60px]"
                 ref={containerRef}
             >
-                <div className="w-full lg:w-7/12 lg:px-4 ">
-                    {isHeight && (
-                        <div className="flex flex-col gap-y-3">
-                            <UpdatesCard data={''} />
-                            <UpdatesCard data={''} />
-                            <UpdatesCard data={''} />
-                            <UpdatesCard data={''} />
-                            <UpdatesCard data={''} />
-                            <UpdatesCard data={''} />
+                {updates.map((update) => (
+                    <div
+                        className="flex items-end bg-yellow-300/0"
+                        key={update?.id}
+                    >
+                        <div
+                            className={`mb-2 flex w-fit max-w-[80%] flex-col rounded-md p-2 shadow-md lg:max-w-[55%]${
+                                auth.currentUser.uid === update?.createdBy
+                                    ? ' ml-auto bg-green-200'
+                                    : ' bg-white'
+                            }`}
+                        >
+                            <p className="mb-[2px] text-xs font-medium">
+                                {update?.createdBy}
+                            </p>
+                            <p className="mb-[2px] text-sm">
+                                {update?.message}
+                            </p>
+                            <span className="ml-auto inline-block text-[0.6875rem]">
+                                {update?.createdAt?.seconds}
+                            </span>
                         </div>
-                    )}
-                </div>
+                    </div>
+                ))}
             </div>
 
             <form
                 onSubmit={handleSubmit}
                 className="absolute inset-x-0 bottom-0 z-50 flex min-h-[64px] items-end border-t bg-white px-2 py-3 md:px-4"
             >
-                <div className="">
+                <div className="hidden">
                     <label
                         htmlFor="attachFiles"
                         className="flex h-[36px] w-[36px] flex-shrink-0 cursor-pointer items-center justify-center rounded-full p-2 hover:bg-slate-400/10 md:h-[40px] md:w-[40px]"
