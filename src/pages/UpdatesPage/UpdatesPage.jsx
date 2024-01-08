@@ -1,15 +1,47 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Modal, UpdatesCard } from '../../components'
 import { FaPlus, FaPaperPlane } from 'react-icons/fa6'
-import { auth, firestore } from '../../services/firebase/firebase'
-import { addDoc, collection, updateDoc } from '@firebase/firestore'
+import { auth, firestore, storage } from '../../services/firebase/firebase'
+import {
+    addDoc,
+    arrayUnion,
+    collection,
+    serverTimestamp,
+    updateDoc,
+} from '@firebase/firestore'
+import { getDownloadURL, ref, uploadBytes } from '@firebase/storage'
 
 const UpdatesPage = () => {
     const containerRef = useRef(null)
     const textareaRef = useRef(null)
 
+    const [formData, setFormData] = useState({
+        message: '',
+        fileAttachments: [],
+    })
+
+    const handleMessageChange = (e) => {
+        setFormData({ ...formData, message: e.target.value })
+    }
+
+    const handleFileChange = (e) => {
+        const files = Array.from(e.target.files)
+
+        console.log(files)
+
+        // Validate file size
+        const validFiles = files.filter((file) => file.size <= 4 * 1024 * 1024) // 4 MB
+
+        if (validFiles.length !== files.length) {
+            alert('Some files exceed the 4MB limit.')
+        }
+
+        setFormData({ ...formData, fileAttachments: validFiles })
+    }
+
     const [isHeight, setIsHeight] = useState(false)
-    const [inputValue, setInputValue] = useState('')
+    const [text, setText] = useState('')
+    const [files, setFiles] = useState([])
 
     useLayoutEffect(() => {
         const containerEl = containerRef.current
@@ -40,17 +72,22 @@ const UpdatesPage = () => {
                 10
             )
             textarea.style.overflowY =
-                textarea.scrollHeight > maxHeight ? 'scroll' : 'hidden'
+                textarea.scrollHeight > maxHeight ? 'auto' : 'hidden'
         }
     }
 
     useEffect(() => {
         autoResize()
-    }, [inputValue])
+    }, [formData.message])
 
-    const handleInputChange = (e) => {
-        setInputValue(e.target.value)
-    }
+    // const handleTextChange = (e) => {
+    //     setText(e.target.value)
+    // }
+
+    // const handleFileChange = (e) => {
+    //     const selectedFiles = Array.from(e.target.files)
+    //     setFiles(selectedFiles)
+    // }
 
     const updatesCollectionRef = collection(firestore, 'updates')
 
@@ -80,6 +117,80 @@ const UpdatesPage = () => {
         }
     }
 
+    const onSubmit = async (e) => {
+        e.preventDefault()
+
+        let fileUrls = []
+
+        if (files.length > 0) {
+            for (const file of files) {
+                const storageRef = ref(storage, `updatesFiles/${file.name}`)
+
+                await uploadBytes(storageRef, file)
+
+                const downloadURL = await getDownloadURL(storageRef)
+                fileUrls.push(downloadURL)
+            }
+        }
+    }
+
+    const handleSubmit = async (e) => {
+        e.preventDefault()
+
+        try {
+            // Get current user id
+
+            let userId
+
+            if (auth.currentUser) {
+                userId = auth.currentUser.uid
+            }
+            console.log('Creating Update by Current User: ', userId)
+
+            const docData = {
+                createdAt: serverTimestamp(),
+                createdBy: userId,
+                message: formData.message,
+            }
+
+            // Add update to the updates collection
+            const docRef = await addDoc(updatesCollectionRef, docData)
+
+            // Update the added doc with the docID field
+            await updateDoc(docRef, { docID: docRef.id })
+
+            // Clear form data
+            setFormData({ message: '', fileAttachments: [] })
+
+            console.log('Document written with ID: ', docRef.id)
+
+            let attachmentURLs = []
+            console.log('before: ', attachmentURLs)
+
+            if (formData.fileAttachments.length > 0) {
+                for (const file of formData.fileAttachments) {
+                    const storageRef = ref(
+                        storage,
+                        `updates/${docRef.id}/${file.name}`
+                    )
+                    await uploadBytes(storageRef, file)
+                    const downloadURL = await getDownloadURL(storageRef)
+                    attachmentURLs.push(downloadURL)
+                }
+            }
+
+            console.log('after: ', attachmentURLs)
+
+            // Updated the added doc with URLs for attached files
+            await updateDoc(docRef, { fileAttachments: attachmentURLs })
+
+            alert('Update message sent successfully!')
+        } catch (error) {
+            console.error('Error sending message:', error)
+            alert('An error occurred while sending the message.')
+        }
+    }
+
     return (
         <>
             <div
@@ -99,7 +210,11 @@ const UpdatesPage = () => {
                     )}
                 </div>
             </div>
-            <div className="absolute inset-x-0 bottom-0 flex min-h-[64px] items-end border-t bg-white px-2 py-3 md:px-4">
+
+            <form
+                onSubmit={handleSubmit}
+                className="absolute inset-x-0 bottom-0 z-50 flex min-h-[64px] items-end border-t bg-white px-2 py-3 md:px-4"
+            >
                 <div>
                     <label
                         htmlFor="attachFiles"
@@ -112,28 +227,37 @@ const UpdatesPage = () => {
                         name="attachFiles"
                         id="attachFiles"
                         className="hidden"
+                        accept="image/*,.pdf,.docx"
+                        multiple
+                        onChange={handleFileChange}
                     />
                 </div>
                 <div className="mx-[6px] flex flex-1 items-end md:mx-3">
                     <textarea
                         ref={textareaRef}
                         rows="1"
-                        onChange={handleInputChange}
-                        value={inputValue}
+                        onChange={handleMessageChange}
+                        value={formData.message}
                         style={{ maxHeight: '160px' }}
                         className="scroll-area m-0 w-full resize-none rounded-md border-none bg-slate-400/10 outline-none focus:ring-0"
                     />
                 </div>
                 <div>
                     <button
-                        type="button"
-                        onClick={addNewUpdate}
-                        className="flex h-[36px] w-[36px] flex-shrink-0 cursor-pointer items-center justify-center rounded-full p-2 hover:bg-slate-400/10 md:h-[40px] md:w-[40px]"
+                        disabled={
+                            formData.fileAttachments.length === 0 &&
+                            formData.message === ''
+                                ? true
+                                : false
+                        }
+                        type="submit"
+                        // onClick={addNewUpdate}
+                        className="flex h-[36px] w-[36px] flex-shrink-0 cursor-pointer items-center justify-center rounded-full p-2 hover:bg-slate-400/10 disabled:cursor-not-allowed disabled:text-slate-400 disabled:hover:bg-transparent md:h-[40px] md:w-[40px]"
                     >
                         <FaPaperPlane className="text-xl md:text-2xl" />
                     </button>
                 </div>
-            </div>
+            </form>
         </>
     )
 }
