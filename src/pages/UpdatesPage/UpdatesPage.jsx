@@ -4,12 +4,12 @@ import { FaPlus, FaPaperPlane } from 'react-icons/fa6'
 import { auth, firestore, storage } from '../../services/firebase/firebase'
 import {
     addDoc,
-    arrayUnion,
     collection,
     serverTimestamp,
     updateDoc,
 } from '@firebase/firestore'
 import { getDownloadURL, ref, uploadBytes } from '@firebase/storage'
+import imageCompression from 'browser-image-compression'
 
 const UpdatesPage = () => {
     const containerRef = useRef(null)
@@ -44,15 +44,18 @@ const UpdatesPage = () => {
     }
 
     const handleFileChange = (e) => {
+        const maxSize = 8
         const files = Array.from(e.target.files)
 
         console.log('Selected Files: ', files)
 
         // Validate file size
-        const validFiles = files.filter((file) => file.size <= 4 * 1024 * 1024) // 4 MB
+        const validFiles = files.filter(
+            (file) => file.size <= maxSize * 1024 * 1024
+        ) // 4 MB
 
         if (validFiles.length !== files.length) {
-            alert('Some files exceed the 4MB limit.')
+            alert(`Some files exceed the ${maxSize}MB limit.`)
         }
 
         setFormData({ ...formData, fileAttachments: validFiles })
@@ -76,6 +79,33 @@ const UpdatesPage = () => {
     useEffect(() => {
         autoResize()
     }, [formData.message])
+
+    const handleImageUpload = async (imageFile) => {
+        // Check if the image exceeds 4MB
+        if (imageFile.size > 4 * 1024 * 1024) {
+            // Compress the image
+            const compressedImage = await compressImage(imageFile)
+            return compressedImage
+        } else {
+            // If the image is already below 4MB, return the original image
+            return imageFile
+        }
+    }
+
+    const compressImage = async (imageFile) => {
+        const options = {
+            maxSizeMB: 1, // Set your desired max size in MB
+            maxWidthOrHeight: 1920, // Set your desired max width or height
+        }
+
+        try {
+            const compressedFile = await imageCompression(imageFile, options)
+            return compressedFile
+        } catch (error) {
+            console.error('Error compressing image:', error)
+            return null
+        }
+    }
 
     const updatesCollectionRef = collection(firestore, 'updates')
 
@@ -113,13 +143,24 @@ const UpdatesPage = () => {
 
             if (formData.fileAttachments.length > 0) {
                 for (const file of formData.fileAttachments) {
-                    const storageRef = ref(
-                        storage,
-                        `updates/${docRef.id}/${file.name}`
-                    )
-                    await uploadBytes(storageRef, file)
-                    const downloadURL = await getDownloadURL(storageRef)
-                    attachmentURLs.push(downloadURL)
+                    if (file.type.startsWith('image')) {
+                        const compressedFile = await compressImage(file)
+                        const storageRef = ref(
+                            storage,
+                            `updates/${docRef.id}/${compressedFile.name}`
+                        )
+                        await uploadBytes(storageRef, compressedFile)
+                        const downloadURL = await getDownloadURL(storageRef)
+                        attachmentURLs.push(downloadURL)
+                    } else {
+                        const storageRef = ref(
+                            storage,
+                            `updates/${docRef.id}/${file.name}`
+                        )
+                        await uploadBytes(storageRef, file)
+                        const downloadURL = await getDownloadURL(storageRef)
+                        attachmentURLs.push(downloadURL)
+                    }
                 }
             }
 
@@ -157,7 +198,7 @@ const UpdatesPage = () => {
                 onSubmit={handleSubmit}
                 className="absolute inset-x-0 bottom-0 z-50 flex min-h-[64px] items-end border-t bg-white px-2 py-3 md:px-4"
             >
-                <div className="hidden">
+                <div className="">
                     <label
                         htmlFor="attachFiles"
                         className="flex h-[36px] w-[36px] flex-shrink-0 cursor-pointer items-center justify-center rounded-full p-2 hover:bg-slate-400/10 md:h-[40px] md:w-[40px]"
