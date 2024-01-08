@@ -150,7 +150,7 @@ const KOKOPage = () => {
                 pauseOnHover
                 theme="dark"
             />
-            <div className="container">
+            <div className="container px-4">
                 <form
                     onSubmit={handleCalculation}
                     autoComplete="off"
