@@ -5,6 +5,7 @@ import {
     addDoc,
     collection,
     getDocs,
+    onSnapshot,
     orderBy,
     query,
     serverTimestamp,
@@ -170,10 +171,10 @@ const UpdatesPage = () => {
             // Clear form data
             setFormData({ message: '', fileAttachments: [] })
 
-            alert('Update message sent successfully!')
+            // alert('Update message sent successfully!')
         } catch (error) {
             console.error('Error sending message:', error)
-            alert('An error occurred while sending the message.')
+            // alert('An error occurred while sending the message.')
         }
     }
 
@@ -183,12 +184,17 @@ const UpdatesPage = () => {
             // "desc" For descending order
             // "asc" For ascending order
             const q = query(updatesCollectionRef, orderBy('createdAt', 'asc'))
-            const querySnapshot = await getDocs(q)
-            const updatesData = querySnapshot.docs.map((doc) => ({
-                id: doc.id,
-                ...doc.data(),
-            }))
-            setUpdates(updatesData)
+
+            const unsubscribe = onSnapshot(q, (snapshot) => {
+                const updatesData = snapshot.docs.map((doc) => ({
+                    id: doc.id,
+                    ...doc.data(),
+                }))
+                setUpdates(updatesData)
+            })
+
+            // Clean up the listener when the component unmounts
+            return () => unsubscribe()
         } catch (error) {
             console.error('Error fetching messages:', error)
         }
