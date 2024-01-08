@@ -15,33 +15,11 @@ const UpdatesPage = () => {
     const containerRef = useRef(null)
     const textareaRef = useRef(null)
 
+    const [isHeight, setIsHeight] = useState(false)
     const [formData, setFormData] = useState({
         message: '',
         fileAttachments: [],
     })
-
-    const handleMessageChange = (e) => {
-        setFormData({ ...formData, message: e.target.value })
-    }
-
-    const handleFileChange = (e) => {
-        const files = Array.from(e.target.files)
-
-        console.log(files)
-
-        // Validate file size
-        const validFiles = files.filter((file) => file.size <= 4 * 1024 * 1024) // 4 MB
-
-        if (validFiles.length !== files.length) {
-            alert('Some files exceed the 4MB limit.')
-        }
-
-        setFormData({ ...formData, fileAttachments: validFiles })
-    }
-
-    const [isHeight, setIsHeight] = useState(false)
-    const [text, setText] = useState('')
-    const [files, setFiles] = useState([])
 
     useLayoutEffect(() => {
         const containerEl = containerRef.current
@@ -60,6 +38,25 @@ const UpdatesPage = () => {
 
         return () => {}
     }, [])
+
+    const handleMessageChange = (e) => {
+        setFormData({ ...formData, message: e.target.value })
+    }
+
+    const handleFileChange = (e) => {
+        const files = Array.from(e.target.files)
+
+        console.log('Selected Files: ', files)
+
+        // Validate file size
+        const validFiles = files.filter((file) => file.size <= 4 * 1024 * 1024) // 4 MB
+
+        if (validFiles.length !== files.length) {
+            alert('Some files exceed the 4MB limit.')
+        }
+
+        setFormData({ ...formData, fileAttachments: validFiles })
+    }
 
     const autoResize = () => {
         if (textareaRef.current) {
@@ -80,59 +77,7 @@ const UpdatesPage = () => {
         autoResize()
     }, [formData.message])
 
-    // const handleTextChange = (e) => {
-    //     setText(e.target.value)
-    // }
-
-    // const handleFileChange = (e) => {
-    //     const selectedFiles = Array.from(e.target.files)
-    //     setFiles(selectedFiles)
-    // }
-
     const updatesCollectionRef = collection(firestore, 'updates')
-
-    const addNewUpdate = async () => {
-        try {
-            // Get current user id
-            const user = auth.currentUser
-            let userId
-            if (user) {
-                userId = user.uid
-            }
-            // Add the document
-            const docRef = await addDoc(updatesCollectionRef, {
-                message: '',
-                fileAttachments: [],
-                createdAt: null,
-                createdBy: userId,
-            })
-            // Retrieve the document ID from the added document
-            const docId = docRef.id
-
-            // Update the added document with the docID field
-            await updateDoc(docRef, { docID: docId })
-            console.log('Document written with ID: ', docRef.id)
-        } catch (error) {
-            console.error('Error adding document: ', error)
-        }
-    }
-
-    const onSubmit = async (e) => {
-        e.preventDefault()
-
-        let fileUrls = []
-
-        if (files.length > 0) {
-            for (const file of files) {
-                const storageRef = ref(storage, `updatesFiles/${file.name}`)
-
-                await uploadBytes(storageRef, file)
-
-                const downloadURL = await getDownloadURL(storageRef)
-                fileUrls.push(downloadURL)
-            }
-        }
-    }
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -165,7 +110,6 @@ const UpdatesPage = () => {
             console.log('Document written with ID: ', docRef.id)
 
             let attachmentURLs = []
-            console.log('before: ', attachmentURLs)
 
             if (formData.fileAttachments.length > 0) {
                 for (const file of formData.fileAttachments) {
@@ -178,8 +122,6 @@ const UpdatesPage = () => {
                     attachmentURLs.push(downloadURL)
                 }
             }
-
-            console.log('after: ', attachmentURLs)
 
             // Updated the added doc with URLs for attached files
             await updateDoc(docRef, { fileAttachments: attachmentURLs })
@@ -215,7 +157,7 @@ const UpdatesPage = () => {
                 onSubmit={handleSubmit}
                 className="absolute inset-x-0 bottom-0 z-50 flex min-h-[64px] items-end border-t bg-white px-2 py-3 md:px-4"
             >
-                <div>
+                <div className="hidden">
                     <label
                         htmlFor="attachFiles"
                         className="flex h-[36px] w-[36px] flex-shrink-0 cursor-pointer items-center justify-center rounded-full p-2 hover:bg-slate-400/10 md:h-[40px] md:w-[40px]"
