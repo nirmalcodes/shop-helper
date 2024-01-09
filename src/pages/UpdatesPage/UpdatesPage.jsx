@@ -188,34 +188,12 @@ const UpdatesPage = () => {
     return (
         <>
             <div
-                className="scroll-area container relative flex-1 overflow-hidden overflow-y-auto scroll-smooth bg-green-300/0 px-4 pb-[60px]"
+                className="scroll-area container relative mb-4 flex-1 overflow-hidden overflow-y-auto scroll-smooth bg-green-300/0 px-4 pb-[44px]"
                 ref={containerRef}
             >
                 {isHeight &&
                     updates.map((updateDoc) => (
                         <UpdateCard key={updateDoc?.id} update={updateDoc} />
-                        // <div
-                        //     className="flex items-end bg-yellow-300/0"
-                        //     key={update?.id}
-                        // >
-                        //     <div
-                        //         className={`mb-2 flex w-fit max-w-[80%] flex-col rounded-md p-2 shadow-md lg:max-w-[55%]${
-                        //             auth.currentUser.uid === update?.createdBy
-                        //                 ? ' ml-auto bg-green-200'
-                        //                 : ' bg-white'
-                        //         }`}
-                        //     >
-                        //         <p className="mb-[2px] text-xs font-medium">
-                        //             {update?.createdBy}
-                        //         </p>
-                        //         <p className="mb-[2px] text-sm">
-                        //             {update?.message}
-                        //         </p>
-                        //         <span className="ml-auto inline-block text-[0.6875rem]">
-                        //             {update?.createdAt?.seconds}
-                        //         </span>
-                        //     </div>
-                        // </div>
                     ))}
             </div>
 
@@ -241,14 +219,6 @@ const UpdatesPage = () => {
                     />
                 </div>
                 <div className="mx-[6px] flex flex-1 items-end md:mx-3">
-                    {/* <textarea
-                        ref={textareaRef}
-                        rows="1"
-                        onChange={handleMessageChange}
-                        value={formData.message}
-                        style={{ maxHeight: '160px' }}
-                        className="scroll-area m-0 w-full resize-none rounded-md border-none bg-slate-400/10 outline-none focus:ring-0"
-                    /> */}
                     <AutoResizeTextarea
                         onChange={handleMessageChange}
                         value={formData.message}
