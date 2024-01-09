@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react'
 import { AuthContext } from '../../contexts/AuthContext'
 import { FaCalculator } from 'react-icons/fa6'
-import { StatCard, UpdatesCard } from '../../components'
+import { StatCard, UpdateCard } from '../../components'
 
 const HomePage = () => {
     const { user, logOut } = useContext(AuthContext)
@@ -27,7 +27,7 @@ const HomePage = () => {
                         <div className="flex flex-col gap-y-4 py-5">
                             {updates && updates.length > 0 ? (
                                 updates.map((update) => (
-                                    <UpdatesCard data={update} />
+                                    <UpdateCard data={update} />
                                 ))
                             ) : (
                                 <div className="grid min-h-[100px] place-items-center font-medium text-slate-500/50">
