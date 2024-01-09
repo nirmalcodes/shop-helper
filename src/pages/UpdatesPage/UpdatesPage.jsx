@@ -13,10 +13,10 @@ import {
 } from '@firebase/firestore'
 import { getDownloadURL, ref, uploadBytes } from '@firebase/storage'
 import imageCompression from 'browser-image-compression'
+import { AutoResizeTextarea, UpdateCard } from '../../components'
 
 const UpdatesPage = () => {
     const containerRef = useRef(null)
-    const textareaRef = useRef(null)
 
     const [isHeight, setIsHeight] = useState(false)
     const [formData, setFormData] = useState({
@@ -64,25 +64,6 @@ const UpdatesPage = () => {
 
         setFormData({ ...formData, fileAttachments: validFiles })
     }
-
-    const autoResize = () => {
-        if (textareaRef.current) {
-            const textarea = textareaRef.current
-            textarea.style.height = 'auto'
-            textarea.style.height = `${textarea.scrollHeight}px`
-
-            const maxHeight = parseInt(
-                window.getComputedStyle(textarea).maxHeight,
-                10
-            )
-            textarea.style.overflowY =
-                textarea.scrollHeight > maxHeight ? 'auto' : 'hidden'
-        }
-    }
-
-    useEffect(() => {
-        autoResize()
-    }, [formData.message])
 
     const handleImageUpload = async (imageFile) => {
         // Check if the image exceeds 4MB
@@ -210,30 +191,32 @@ const UpdatesPage = () => {
                 className="scroll-area container relative flex-1 overflow-hidden overflow-y-auto scroll-smooth bg-green-300/0 px-4 pb-[60px]"
                 ref={containerRef}
             >
-                {updates.map((update) => (
-                    <div
-                        className="flex items-end bg-yellow-300/0"
-                        key={update?.id}
-                    >
-                        <div
-                            className={`mb-2 flex w-fit max-w-[80%] flex-col rounded-md p-2 shadow-md lg:max-w-[55%]${
-                                auth.currentUser.uid === update?.createdBy
-                                    ? ' ml-auto bg-green-200'
-                                    : ' bg-white'
-                            }`}
-                        >
-                            <p className="mb-[2px] text-xs font-medium">
-                                {update?.createdBy}
-                            </p>
-                            <p className="mb-[2px] text-sm">
-                                {update?.message}
-                            </p>
-                            <span className="ml-auto inline-block text-[0.6875rem]">
-                                {update?.createdAt?.seconds}
-                            </span>
-                        </div>
-                    </div>
-                ))}
+                {isHeight &&
+                    updates.map((updateDoc) => (
+                        <UpdateCard key={updateDoc?.id} update={updateDoc} />
+                        // <div
+                        //     className="flex items-end bg-yellow-300/0"
+                        //     key={update?.id}
+                        // >
+                        //     <div
+                        //         className={`mb-2 flex w-fit max-w-[80%] flex-col rounded-md p-2 shadow-md lg:max-w-[55%]${
+                        //             auth.currentUser.uid === update?.createdBy
+                        //                 ? ' ml-auto bg-green-200'
+                        //                 : ' bg-white'
+                        //         }`}
+                        //     >
+                        //         <p className="mb-[2px] text-xs font-medium">
+                        //             {update?.createdBy}
+                        //         </p>
+                        //         <p className="mb-[2px] text-sm">
+                        //             {update?.message}
+                        //         </p>
+                        //         <span className="ml-auto inline-block text-[0.6875rem]">
+                        //             {update?.createdAt?.seconds}
+                        //         </span>
+                        //     </div>
+                        // </div>
+                    ))}
             </div>
 
             <form
@@ -258,13 +241,17 @@ const UpdatesPage = () => {
                     />
                 </div>
                 <div className="mx-[6px] flex flex-1 items-end md:mx-3">
-                    <textarea
+                    {/* <textarea
                         ref={textareaRef}
                         rows="1"
                         onChange={handleMessageChange}
                         value={formData.message}
                         style={{ maxHeight: '160px' }}
                         className="scroll-area m-0 w-full resize-none rounded-md border-none bg-slate-400/10 outline-none focus:ring-0"
+                    /> */}
+                    <AutoResizeTextarea
+                        onChange={handleMessageChange}
+                        value={formData.message}
                     />
                 </div>
                 <div>
