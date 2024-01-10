@@ -1,18 +1,10 @@
 import React, { Suspense } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { Route, Routes } from 'react-router-dom'
-import {
-    HomePage,
-    KOKOPage,
-    SignInPage,
-    SignUpPage,
-    UpdatesPage,
-} from './pages'
 import { AuthProvider } from './contexts/AuthContext'
 import { RoutesProvider } from './contexts/RoutesContext'
 import { ProtectedRoute } from './components'
 import ROUTES from './routes'
-// import { ROUTES } from './routes'
 
 const App = () => {
     return (
@@ -102,40 +94,6 @@ const App = () => {
 
                                     return [...mainRoutes, ...childRoutes]
                                 })}
-
-                                {/* <Route
-                                    path={'signin'}
-                                    element={<SignInPage />}
-                                />
-                                <Route
-                                    path={'signup'}
-                                    element={<SignUpPage />}
-                                />
-
-                                <Route
-                                    path={'/'}
-                                    element={
-                                        <ProtectedRoute>
-                                            <HomePage />
-                                        </ProtectedRoute>
-                                    }
-                                />
-                                <Route
-                                    path={'koko'}
-                                    element={
-                                        <ProtectedRoute>
-                                            <KOKOPage />
-                                        </ProtectedRoute>
-                                    }
-                                />
-                                <Route
-                                    path={'updates'}
-                                    element={
-                                        <ProtectedRoute>
-                                            <UpdatesPage />
-                                        </ProtectedRoute>
-                                    }
-                                /> */}
 
                                 <Route
                                     path={'*'}
