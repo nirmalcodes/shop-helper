@@ -24,20 +24,26 @@ const Sidebar = ({ open = true, toggleOpen }) => {
 
                 <nav className="h-[calc(100vh_-_56px)] max-h-[calc(100vh_-_56px)] overflow-hidden overflow-y-auto p-2">
                     <ul className="flex flex-shrink-0 flex-col gap-y-3">
-                        {routes.map((route) => (
-                            <li key={route?.id} onClick={toggleSidebar}>
-                                <NavLink
-                                    to={route?.path}
-                                    className={'sidebar-link'}
-                                >
-                                    {route?.icon && <route.icon />}
+                        {routes.map((route) => {
+                            if (route?.hiddenInSidebar) {
+                                return null
+                            } else {
+                                return (
+                                    <li key={route?.id} onClick={toggleSidebar}>
+                                        <NavLink
+                                            to={route?.path}
+                                            className={'sidebar-link'}
+                                        >
+                                            {route?.icon && <route.icon />}
 
-                                    <span className="text-[0.8125rem] font-medium leading-none">
-                                        {route?.name}
-                                    </span>
-                                </NavLink>
-                            </li>
-                        ))}
+                                            <span className="text-[0.8125rem] font-medium leading-none">
+                                                {route?.name}
+                                            </span>
+                                        </NavLink>
+                                    </li>
+                                )
+                            }
+                        })}
                     </ul>
                 </nav>
             </aside>
