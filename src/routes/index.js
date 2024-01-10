@@ -1,23 +1,75 @@
-import { FaHouse, FaEnvelopeOpenText, FaCalculator } from 'react-icons/fa6'
+import { lazy } from 'react'
+import {
+    FaHouse,
+    FaEnvelopeOpenText,
+    FaCalculator,
+    FaGear,
+} from 'react-icons/fa6'
 
-const routes = [
+const SignInPage = lazy(() => import('../pages/SignInPage/SignInPage'))
+
+const HomePage = lazy(() => import('../pages/HomePage/HomePage'))
+const KOKOPage = lazy(() => import('../pages/KOKOPage/KOKOPage'))
+const UpdatesPage = lazy(() => import('../pages/UpdatesPage/UpdatesPage'))
+
+const SettingsPage = lazy(() => import('../pages/SettingsPage/SettingsPage'))
+const KOKOSettingsPage = lazy(
+    () => import('../pages/KOKOSettingsPage/KOKOSettingsPage')
+)
+
+const ROUTES = [
     {
         id: 1,
-        name: 'Home',
-        icon: FaHouse,
-        path: '/',
+        name: 'Sign in',
+        icon: false,
+        protected: false,
+        path: '/signin',
         main: true,
-        component: true,
-        hiddenInSidebar: false,
+        component: SignInPage,
+        hiddenInSidebar: true,
         children: [],
     },
     {
         id: 2,
+        name: 'Home',
+        icon: FaHouse,
+        protected: true,
+        path: '/',
+        main: true,
+        component: HomePage,
+        hiddenInSidebar: false,
+        children: [],
+    },
+    {
+        id: 3,
         name: 'KOKO',
         icon: FaCalculator,
+        protected: true,
         path: '/koko',
         main: true,
-        component: true,
+        component: KOKOPage,
+        hiddenInSidebar: false,
+        children: [],
+    },
+    {
+        id: 4,
+        name: 'Updates',
+        icon: FaEnvelopeOpenText,
+        protected: true,
+        path: '/updates',
+        main: true,
+        component: UpdatesPage,
+        hiddenInSidebar: false,
+        children: [],
+    },
+    {
+        id: 5,
+        name: 'Settings',
+        icon: FaGear,
+        protected: true,
+        path: '/settings',
+        main: true,
+        component: SettingsPage,
         hiddenInSidebar: false,
         children: [
             {
@@ -26,22 +78,12 @@ const routes = [
                 icon: false,
                 path: '/koko-settings',
                 main: false,
-                component: true,
+                component: KOKOSettingsPage,
                 hiddenInSidebar: true,
                 children: [],
             },
         ],
     },
-    {
-        id: 3,
-        name: 'Updates',
-        icon: FaEnvelopeOpenText,
-        path: '/updates',
-        main: true,
-        component: true,
-        hiddenInSidebar: false,
-        children: [],
-    },
 ]
 
-export default routes
+export default ROUTES
