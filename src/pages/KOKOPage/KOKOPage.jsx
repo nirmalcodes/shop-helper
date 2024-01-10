@@ -1,13 +1,42 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { NumberInput } from '../../components'
 import { images } from '../../utils/constants'
 import { FaTag } from 'react-icons/fa6'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import { firestore } from '../../services/firebase/firebase'
+import { doc, onSnapshot } from '@firebase/firestore'
 
 const KOKOPage = () => {
-    const [convenienceFeeRate, setConvenienceFeeRate] = useState(6)
-    const [discountMode, setDiscountMode] = useState(false)
+    const [convenienceRate, setConvenienceRate] = useState(0)
+    const [isDiscounted, setIsDiscounted] = useState(false)
+    const [disRate, setDisRate] = useState(0)
+    const [disMaxCap, setDisMaxCap] = useState(0)
+
+    const kokoConfigurationsRef = doc(
+        firestore,
+        'kokoConfigurations',
+        'configData'
+    )
+
+    useEffect(() => {
+        const unsub = onSnapshot(kokoConfigurationsRef, (doc) => {
+            // console.log('Current data: ', doc.data())
+            const {
+                convenienceFeeRate,
+                discountMode,
+                discountRate,
+                discountMaxCap,
+            } = doc.data()
+            setConvenienceRate(convenienceFeeRate)
+            setIsDiscounted(discountMode)
+            setDisRate(discountRate)
+            setDisMaxCap(discountMaxCap)
+        })
+        return () => {
+            unsub()
+        }
+    }, [])
 
     const [errors, setErrors] = useState({
         productPriceError: '',
@@ -17,6 +46,8 @@ const KOKOPage = () => {
     const [formData, setFormData] = useState({
         productPrice: '',
         deliveryFee: '',
+        discount: '',
+        discountedPrice: '',
         convenienceFee: '',
         totalWithConvenienceFee: '',
         installmentPerMonth: '',
@@ -25,6 +56,8 @@ const KOKOPage = () => {
     const [calculatedData, setCalculatedData] = useState({
         productPrice: '',
         deliveryFee: '',
+        discount: '',
+        discountedPrice: '',
         convenienceFee: '',
         totalWithConvenienceFee: '',
         installmentPerMonth: '',
@@ -42,6 +75,7 @@ const KOKOPage = () => {
         setErrors({})
     }
 
+    // Function to handle normal mode calculations
     const handleCalculation = (e) => {
         e.preventDefault()
 
@@ -50,7 +84,7 @@ const KOKOPage = () => {
         const deliveryFee = parseFloat(formData.deliveryFee) || 0 // Default to 0 if deliveryFee is not provided
 
         // Define constants
-        let convenienFeePercentage = (100 - convenienceFeeRate) / 100
+        let convenienFeePercentage = (100 - convenienceRate) / 100
 
         // Validate form inputs
         if (formData.productPrice === '') {
@@ -77,29 +111,126 @@ const KOKOPage = () => {
 
         // Calculate values
         const priceWithDelivery = productPrice + deliveryFee
-        const totalWithConvenienceFee = (
+
+        const totalWithConvenienceFee =
             priceWithDelivery / convenienFeePercentage
-        ).toFixed(2)
-        const calculatedConvenienceFee = (
+
+        const calculatedConvenienceFee =
             totalWithConvenienceFee - priceWithDelivery
-        ).toFixed(2)
-        const installmentPerMonth = (totalWithConvenienceFee / 3).toFixed(2)
+
+        const installmentPerMonth = totalWithConvenienceFee / 3
+
+        const fixedCFee = calculatedConvenienceFee.toFixed(2)
+        const fixedTotWCFee = totalWithConvenienceFee.toFixed(2)
+        const fixedInsPerMonth = installmentPerMonth.toFixed(2)
 
         // Update formData with the calculated values
         setFormData({
             ...formData,
-            convenienceFee: parseFloat(calculatedConvenienceFee),
-            totalWithConvenienceFee: parseFloat(totalWithConvenienceFee),
-            installmentPerMonth: parseFloat(installmentPerMonth),
+            convenienceFee: parseFloat(fixedCFee),
+            totalWithConvenienceFee: parseFloat(fixedTotWCFee),
+            installmentPerMonth: parseFloat(fixedInsPerMonth),
         })
 
         // Set clipboard text
         setCalculatedData({
             productPrice,
             deliveryFee,
-            convenienceFee: calculatedConvenienceFee,
-            totalWithConvenienceFee,
-            installmentPerMonth,
+            convenienceFee: parseFloat(fixedCFee),
+            totalWithConvenienceFee: parseFloat(fixedTotWCFee),
+            installmentPerMonth: parseFloat(fixedInsPerMonth),
+        })
+
+        // Set showCopyBtn
+        setShowCopyBtn(true)
+    }
+
+    // Function to handle normal mode calculations
+    const handleDiscountCalculation = (e) => {
+        e.preventDefault()
+
+        // Convert all relevant form data values to numbers
+        const productPrice = parseFloat(formData.productPrice)
+        const deliveryFee = parseFloat(formData.deliveryFee) || 0 // Default to 0 if deliveryFee is not provided
+
+        let convenienFeePercentage = (100 - convenienceRate) / 100
+
+        let discountPercentage = disRate / 100
+
+        // Validate form inputs
+        if (formData.productPrice === '') {
+            setErrors((prevErrors) => ({
+                ...prevErrors,
+                productPriceError: 'Enter Product Price.',
+            }))
+            return
+        }
+        if (isNaN(productPrice) || productPrice < 0) {
+            setErrors((prevErrors) => ({
+                ...prevErrors,
+                productPriceError: 'Invalid Value.',
+            }))
+            return
+        }
+        if (isNaN(deliveryFee) || deliveryFee < 0) {
+            setErrors((prevErrors) => ({
+                ...prevErrors,
+                deliveryFeeError: 'Invalid Delivery Fee.',
+            }))
+            return
+        }
+
+        // Calculate values
+        const clacDiscount = productPrice * discountPercentage
+
+        let maxCapBal = 0,
+            discountedPrice = 0
+
+        if (clacDiscount > disMaxCap) {
+            maxCapBal = clacDiscount - disMaxCap
+
+            discountedPrice = productPrice - disMaxCap
+        } else {
+            discountedPrice = productPrice - clacDiscount
+        }
+
+        const priceWithDelivery = discountedPrice + deliveryFee
+
+        const totalWithConvenienceFee =
+            priceWithDelivery / convenienFeePercentage
+
+        const calculatedConvenienceFee =
+            totalWithConvenienceFee - priceWithDelivery
+
+        const installmentPerMonth = totalWithConvenienceFee / 3
+
+        const discountValue = clacDiscount - maxCapBal
+
+        const fixedDiscount = discountValue.toFixed(2)
+        const fixedDiscountedPrice = discountedPrice.toFixed(2)
+        const fixedCFee = calculatedConvenienceFee.toFixed(2)
+        const fixedTotWCFee = totalWithConvenienceFee.toFixed(2)
+        const fixedInsPerMonth = installmentPerMonth.toFixed(2)
+
+        // Update formData with the calculated values
+        setFormData({
+            ...formData,
+            discount: parseFloat(fixedDiscount),
+            discountedPrice: parseFloat(fixedDiscountedPrice),
+            convenienceFee: parseFloat(fixedCFee),
+            totalWithConvenienceFee: parseFloat(fixedTotWCFee),
+            installmentPerMonth: parseFloat(fixedInsPerMonth),
+        })
+
+        // Set clipboard text
+        setCalculatedData({
+            productPrice,
+            deliveryFee,
+            discount: parseFloat(fixedDiscount),
+            discountedPrice: parseFloat(fixedDiscountedPrice),
+            convenienceFee: parseFloat(fixedCFee),
+            totalWithConvenienceFee: parseFloat(fixedTotWCFee),
+            installmentPerMonth: parseFloat(fixedInsPerMonth),
         })
 
         // Set showCopyBtn
@@ -112,11 +243,20 @@ const KOKOPage = () => {
 
         let calculatedDataText
 
-        // Validate delivery fee
-        if (isNaN(deliveryFee)) {
-            calculatedDataText = `Product Price: Rs. ${calculatedData.productPrice}/=\nConvenience Fee: Rs. ${calculatedData.convenienceFee}/=\nTotal with Convenience Fee: Rs. ${calculatedData.totalWithConvenienceFee}/=\nInstallment Per Month: Rs. ${calculatedData.installmentPerMonth}/=`
+        if (isDiscounted) {
+            // Validate delivery fee
+            if (isNaN(deliveryFee)) {
+                calculatedDataText = `Product Price: Rs. ${calculatedData.productPrice}/=\nDiscount: Rs. ${calculatedData.discount}/=\nDiscounted Price: Rs. ${calculatedData.discountedPrice}/=\nConvenience Fee: Rs. ${calculatedData.convenienceFee}/=\nTotal with Convenience Fee: Rs. ${calculatedData.totalWithConvenienceFee}/=\nInstallment Per Month: Rs. ${calculatedData.installmentPerMonth}/=`
+            } else {
+                calculatedDataText = `Product Price: Rs. ${calculatedData.productPrice}/=\nDelivery Fee: Rs. ${calculatedData.deliveryFee}/=\nDiscount: Rs. ${calculatedData.discount}/=\nDiscounted Price: Rs. ${calculatedData.discountedPrice}/=\nConvenience Fee: Rs. ${calculatedData.convenienceFee}/=\nTotal with Convenience Fee: Rs. ${calculatedData.totalWithConvenienceFee}/=\nInstallment Per Month: Rs. ${calculatedData.installmentPerMonth}/=`
+            }
         } else {
-            calculatedDataText = `Product Price: Rs. ${calculatedData.productPrice}/=\nDelivery Fee: Rs. ${calculatedData.deliveryFee}/=\nConvenience Fee: Rs. ${calculatedData.convenienceFee}/=\nTotal with Convenience Fee: Rs. ${calculatedData.totalWithConvenienceFee}/=\nInstallment Per Month: Rs. ${calculatedData.installmentPerMonth}/=`
+            // Validate delivery fee
+            if (isNaN(deliveryFee)) {
+                calculatedDataText = `Product Price: Rs. ${calculatedData.productPrice}/=\nConvenience Fee: Rs. ${calculatedData.convenienceFee}/=\nTotal with Convenience Fee: Rs. ${calculatedData.totalWithConvenienceFee}/=\nInstallment Per Month: Rs. ${calculatedData.installmentPerMonth}/=`
+            } else {
+                calculatedDataText = `Product Price: Rs. ${calculatedData.productPrice}/=\nDelivery Fee: Rs. ${calculatedData.deliveryFee}/=\nConvenience Fee: Rs. ${calculatedData.convenienceFee}/=\nTotal with Convenience Fee: Rs. ${calculatedData.totalWithConvenienceFee}/=\nInstallment Per Month: Rs. ${calculatedData.installmentPerMonth}/=`
+            }
         }
 
         // Create a temporary textarea element for copying to clipboard
@@ -138,21 +278,25 @@ const KOKOPage = () => {
     return (
         <>
             <ToastContainer
-                className={'px-3 md:px-0'}
-                position="bottom-right"
-                autoClose={5000}
-                hideProgressBar={false}
+                position="top-center"
+                autoClose={2000}
+                hideProgressBar={true}
                 newestOnTop={false}
                 closeOnClick
                 rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
+                pauseOnFocusLoss={false}
+                draggable={false}
+                pauseOnHover={false}
                 theme="dark"
             />
             <div className="container px-4">
                 <form
-                    onSubmit={handleCalculation}
+                    onSubmit={
+                        isDiscounted
+                            ? handleDiscountCalculation
+                            : handleCalculation
+                    }
+                    // onSubmit={handleCalculation}
                     autoComplete="off"
                     className="mx-0 w-full max-w-[650px] rounded-lg bg-white px-4 py-8 shadow-md md:mx-auto lg:mx-0"
                 >
@@ -164,10 +308,10 @@ const KOKOPage = () => {
                             loading="lazy"
                             width={128}
                         />
-                        {discountMode && (
+                        {isDiscounted && (
                             <div className="ml-auto flex flex-col items-center leading-none text-red-600/90">
                                 <FaTag className="text-[2rem]" />
-                                <p className="font-medium">{'50'}% OFF</p>
+                                <p className="font-medium">{disRate}% OFF</p>
                             </div>
                         )}
                     </div>
@@ -225,6 +369,44 @@ const KOKOPage = () => {
                         </div>
                     </div>
 
+                    {isDiscounted && (
+                        <>
+                            <div className="form-group flex-wrap md:flex">
+                                <label
+                                    htmlFor="discount"
+                                    className="form-label mb-2 text-sm font-medium text-slate-700 md:mb-0 md:w-1/3 md:px-4"
+                                >
+                                    Discount
+                                </label>
+                                <div className="md:w-4/6 md:px-4">
+                                    <NumberInput
+                                        name="discount"
+                                        id="discount"
+                                        className="form-input"
+                                        value={formData.discount}
+                                        disabled
+                                    />
+                                </div>
+                            </div>
+                            <div className="form-group flex-wrap md:flex">
+                                <label
+                                    htmlFor="discountedPrice"
+                                    className="form-label mb-2 text-sm font-medium text-slate-700 md:mb-0 md:w-1/3 md:px-4"
+                                >
+                                    Discounted Price
+                                </label>
+                                <div className="md:w-4/6 md:px-4">
+                                    <NumberInput
+                                        name="discountedPrice"
+                                        id="discountedPrice"
+                                        className="form-input"
+                                        value={formData.discountedPrice}
+                                        disabled
+                                    />
+                                </div>
+                            </div>
+                        </>
+                    )}
                     <div className="form-group flex-wrap md:flex">
                         <label
                             htmlFor="convenienceFee"
