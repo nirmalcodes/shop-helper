@@ -298,7 +298,7 @@ const KOKOPage = () => {
                     }
                     // onSubmit={handleCalculation}
                     autoComplete="off"
-                    className="mx-0 w-full max-w-[650px] rounded-lg bg-white px-4 py-8 shadow-md md:mx-auto lg:mx-0"
+                    className="mx-0 w-full max-w-[650px] rounded-lg bg-white px-4 py-6 shadow-md md:mx-auto lg:mx-0"
                 >
                     {/* Logo and Calc Status */}
                     <div className="mb-5 flex items-center">
@@ -407,6 +407,7 @@ const KOKOPage = () => {
                             </div>
                         </>
                     )}
+
                     <div className="form-group flex-wrap md:flex">
                         <label
                             htmlFor="convenienceFee"
@@ -461,7 +462,7 @@ const KOKOPage = () => {
                         </div>
                     </div>
 
-                    <div className="mt-12 flex flex-col-reverse gap-y-3 md:flex-row md:flex-wrap">
+                    <div className="mt-8 flex flex-col-reverse gap-y-3 md:flex-row md:flex-wrap">
                         {showCopyBtn && (
                             <div className="md:w-1/2 md:px-4">
                                 <button
