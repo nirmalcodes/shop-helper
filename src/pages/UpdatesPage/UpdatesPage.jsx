@@ -188,7 +188,7 @@ const UpdatesPage = () => {
     return (
         <>
             <div
-                className="scroll-area container relative mb-4 flex-1 overflow-hidden overflow-y-auto scroll-smooth bg-green-300/0 px-4 pb-[44px]"
+                className="scroll-area container relative mb-16 flex-1 overflow-hidden overflow-y-auto scroll-smooth bg-green-300/0 px-4 py-5"
                 ref={containerRef}
             >
                 {isHeight &&
