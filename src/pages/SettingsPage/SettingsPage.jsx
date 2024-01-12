@@ -16,12 +16,10 @@ const SettingsPage = () => {
             const menuElementBoundings = getBoundings(menuElement)
             const contentlementBoundings = getBoundings(contentElement)
 
-            const menuWidth = menuElementBoundings.width
             const menuHeight = menuElementBoundings.height
             const contentHeight = contentlementBoundings.height
 
-            if (menuWidth && menuHeight && contentHeight) {
-                menuElement.style.maxWidth = `${menuWidth}px`
+            if (menuHeight && contentHeight) {
                 if (menuHeight === contentHeight) {
                     menuElement.style.maxHeight = `${menuHeight}px`
                     contentElement.style.maxHeight = `${contentHeight}px`
@@ -47,7 +45,7 @@ const SettingsPage = () => {
     return (
         <div className="relative flex flex-1 flex-col md:flex-row">
             <div
-                className="scroll-area flex w-full gap-2 overflow-hidden overflow-x-auto border-r bg-white px-3 py-3 md:flex-col md:gap-3 md:overflow-y-auto lg:w-[240px]"
+                className="scroll-area flex w-full max-w-[100vw] gap-2 overflow-hidden overflow-x-auto border-r bg-white px-3 py-3 md:max-w-[auto] md:flex-col md:gap-3 md:overflow-y-auto lg:w-[240px]"
                 ref={menuRef}
             >
                 {isStyled &&
