@@ -22,7 +22,7 @@ const Sidebar = ({ open = true, toggleOpen }) => {
                     )}
                 </div>
 
-                <nav className="h-[calc(100vh_-_56px)] max-h-[calc(100vh_-_56px)] overflow-hidden overflow-y-auto p-2">
+                <nav className="h-[calc(100vh_-_56px)] max-h-[calc(100vh_-_56px)] overflow-hidden overflow-y-auto px-2 py-3">
                     <ul className="flex flex-shrink-0 flex-col gap-y-3">
                         {routes.map((route) => {
                             if (route?.hiddenInSidebar) {
