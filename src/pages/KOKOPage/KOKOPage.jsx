@@ -289,7 +289,7 @@ const KOKOPage = () => {
                 pauseOnHover={false}
                 theme="dark"
             />
-            <div className="container px-4">
+            <div className="container px-4 py-5">
                 <form
                     onSubmit={
                         isDiscounted
