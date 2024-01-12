@@ -14,7 +14,7 @@ const HomePage = () => {
 
     return (
         <>
-            <section className="container px-4">
+            <section className="container px-4 py-5">
                 <div className="mb-5 flex flex-row flex-wrap items-center">
                     <StatCard data={statCard} />
                 </div>
