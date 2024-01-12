@@ -6,6 +6,7 @@ const SettingsPage = () => {
     const contentRef = useRef(null)
 
     const [isStyled, setIsStyled] = useState(false)
+    const [activeTab, setactiveTab] = useState(1)
 
     useLayoutEffect(() => {
         const menuElement = menuRef.current
@@ -15,10 +16,12 @@ const SettingsPage = () => {
             const menuElementBoundings = getBoundings(menuElement)
             const contentlementBoundings = getBoundings(contentElement)
 
+            const menuWidth = menuElementBoundings.width
             const menuHeight = menuElementBoundings.height
             const contentHeight = contentlementBoundings.height
 
-            if (menuHeight && contentHeight) {
+            if (menuWidth && menuHeight && contentHeight) {
+                menuElement.style.maxWidth = `${menuWidth}px`
                 if (menuHeight === contentHeight) {
                     menuElement.style.maxHeight = `${menuHeight}px`
                     contentElement.style.maxHeight = `${contentHeight}px`
@@ -31,23 +34,50 @@ const SettingsPage = () => {
         return () => {}
     }, [])
 
-    const tabs = [1, 2, 3]
+    const tabs = [
+        { id: 1, name: 'User Settings' },
+        { id: 2, name: 'KOKO Settings' },
+        { id: 3, name: 'Updates Settings' },
+    ]
+
+    const handleTabs = (index) => {
+        setactiveTab(index)
+    }
+
     return (
-        <div className="relative flex flex-1">
+        <div className="relative flex flex-1 flex-col md:flex-row">
             <div
-                className="w-[240px] border-r bg-white px-4 py-2"
+                className="scroll-area flex w-full gap-2 overflow-hidden overflow-x-auto border-r bg-white px-3 py-3 md:flex-col md:gap-3 md:overflow-y-auto lg:w-[240px]"
                 ref={menuRef}
             >
-                <ul className="">
-                    {tabs.map((tab, index) => (
-                        <li className="" key={`tab-${index + 1}`}>
-                            {`Tab ${index + 1}`}
-                        </li>
+                {isStyled &&
+                    tabs.map((tab) => (
+                        <button
+                            type="button"
+                            className={`w-full text-nowrap rounded-md border px-4 py-2 text-left md:text-wrap ${
+                                activeTab === tab.id
+                                    ? 'bg-indigo-600 text-white'
+                                    : 'bg-slate-100/50'
+                            }`}
+                            onClick={(e) => handleTabs(tab.id)}
+                            key={tab?.name}
+                        >
+                            {tab?.name}
+                        </button>
                     ))}
-                </ul>
             </div>
             <div className="flex-1" ref={contentRef}>
-                SettingsPage-Content
+                {isStyled &&
+                    tabs.map((tab) => (
+                        <div
+                            className={`px-4 py-5 ${
+                                activeTab === tab.id ? 'block' : 'hidden'
+                            }`}
+                            key={`pannel-${tab.name}`}
+                        >
+                            {tab?.name}
+                        </div>
+                    ))}
             </div>
         </div>
     )
