@@ -2,7 +2,14 @@ import React, { useContext, useEffect, useState } from 'react'
 import { AuthContext } from '../../contexts/AuthContext'
 import { FaCalculator } from 'react-icons/fa6'
 import { StatCard, UpdateCard } from '../../components'
-import { doc, onSnapshot } from '@firebase/firestore'
+import {
+    collection,
+    doc,
+    limit,
+    onSnapshot,
+    orderBy,
+    query,
+} from '@firebase/firestore'
 import { firestore } from '../../services/firebase/firebase'
 
 const HomePage = () => {
@@ -20,6 +27,33 @@ const HomePage = () => {
         'configData'
     )
 
+    const updatesCollectionRef = collection(firestore, 'updates')
+    // Function to fetch all documents from the "updates" collection
+    const fetchUpdates = async () => {
+        try {
+            // "desc" For descending order
+            // "asc" For ascending order
+            const q = query(
+                updatesCollectionRef,
+                orderBy('createdAt', 'desc'),
+                limit(5)
+            )
+
+            const unsubscribe = onSnapshot(q, (snapshot) => {
+                const updatesData = snapshot.docs.map((doc) => ({
+                    id: doc.id,
+                    ...doc.data(),
+                }))
+                setUpdates(updatesData)
+            })
+
+            // Clean up the listener when the component unmounts
+            return () => unsubscribe()
+        } catch (error) {
+            console.error('Error fetching messages:', error)
+        }
+    }
+
     useEffect(() => {
         const unsub = onSnapshot(kokoConfigurationsRef, (doc) => {
             // console.log('Current data: ', doc.data())
@@ -29,10 +63,13 @@ const HomePage = () => {
                 value: discountMode ? 'Discount' : 'Default',
             }))
         })
+        fetchUpdates()
         return () => {
             unsub()
         }
     }, [])
+
+    console.log(updates)
 
     return (
         <>
@@ -49,7 +86,7 @@ const HomePage = () => {
                         <div className="flex flex-col gap-y-4 py-5">
                             {updates && updates.length > 0 ? (
                                 updates.map((update) => (
-                                    <UpdateCard data={update} />
+                                    <UpdateCard data={update} key={update.id} />
                                 ))
                             ) : (
                                 <div className="grid min-h-[100px] place-items-center font-medium text-slate-500/50">
