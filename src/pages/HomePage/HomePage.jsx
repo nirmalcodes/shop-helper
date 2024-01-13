@@ -1,16 +1,38 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { AuthContext } from '../../contexts/AuthContext'
 import { FaCalculator } from 'react-icons/fa6'
 import { StatCard, UpdateCard } from '../../components'
+import { doc, onSnapshot } from '@firebase/firestore'
+import { firestore } from '../../services/firebase/firebase'
 
 const HomePage = () => {
     const { user, logOut } = useContext(AuthContext)
     const [statCard, setStatCard] = useState({
         name: 'KOKO Calc Mode',
-        value: 'Default',
+        value: '-',
         icon: FaCalculator,
     })
     const [updates, setUpdates] = useState([])
+
+    const kokoConfigurationsRef = doc(
+        firestore,
+        'kokoConfigurations',
+        'configData'
+    )
+
+    useEffect(() => {
+        const unsub = onSnapshot(kokoConfigurationsRef, (doc) => {
+            // console.log('Current data: ', doc.data())
+            const { discountMode } = doc.data()
+            setStatCard((prevData) => ({
+                ...prevData,
+                value: discountMode ? 'Discount' : 'Default',
+            }))
+        })
+        return () => {
+            unsub()
+        }
+    }, [])
 
     return (
         <>
