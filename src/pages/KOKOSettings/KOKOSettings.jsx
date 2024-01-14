@@ -4,7 +4,7 @@ import { Switch } from '@headlessui/react'
 import { firestore } from '../../services/firebase/firebase'
 import { doc, onSnapshot, setDoc } from '@firebase/firestore'
 
-const KOKOSettingsPage = () => {
+const KOKOSettings = () => {
     const [docAvailable, setDocAvailable] = useState(false)
     const [formData, setFormData] = useState({
         feeRate: '',
@@ -279,4 +279,4 @@ const KOKOSettingsPage = () => {
     )
 }
 
-export default KOKOSettingsPage
+export default KOKOSettings

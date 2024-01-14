@@ -2,9 +2,9 @@ import React from 'react'
 import { FaChevronRight } from 'react-icons/fa6'
 import { Link } from 'react-router-dom'
 
-const SettingsPage = () => {
+const Settings = () => {
     const tabs = [
-        { id: 1, name: 'User Settings', path: '' },
+        { id: 1, name: 'User Settings', path: '/settings/user_settings' },
         { id: 2, name: 'KOKO Settings', path: '/settings/koko_settings' },
         { id: 3, name: 'Updates Settings', path: '' },
     ]
@@ -23,4 +23,4 @@ const SettingsPage = () => {
     )
 }
 
-export default SettingsPage
+export default Settings

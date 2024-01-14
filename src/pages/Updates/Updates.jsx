@@ -15,7 +15,7 @@ import { getDownloadURL, ref, uploadBytes } from '@firebase/storage'
 import imageCompression from 'browser-image-compression'
 import { AutoResizeTextarea, UpdateCard } from '../../components'
 
-const UpdatesPage = () => {
+const Updates = () => {
     const containerRef = useRef(null)
 
     const [isHeight, setIsHeight] = useState(false)
@@ -233,4 +233,4 @@ const UpdatesPage = () => {
     )
 }
 
-export default UpdatesPage
+export default Updates

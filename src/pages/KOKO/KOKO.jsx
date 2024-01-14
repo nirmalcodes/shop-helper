@@ -7,7 +7,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import { firestore } from '../../services/firebase/firebase'
 import { doc, onSnapshot } from '@firebase/firestore'
 
-const KOKOPage = () => {
+const KOKO = () => {
     const [convenienceRate, setConvenienceRate] = useState(0)
     const [isDiscounted, setIsDiscounted] = useState(false)
     const [disRate, setDisRate] = useState(0)
@@ -489,4 +489,4 @@ const KOKOPage = () => {
     )
 }
 
-export default KOKOPage
+export default KOKO

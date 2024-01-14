@@ -13,7 +13,7 @@ import {
 } from '@firebase/firestore'
 import { formatDateTime } from '../../utils/helpers/formatters/formatDateTime'
 
-const HomePage = () => {
+const Home = () => {
     const { user, logOut } = useContext(AuthContext)
     const [statCard, setStatCard] = useState({
         name: 'KOKO Calc Mode',
@@ -98,4 +98,4 @@ const HomePage = () => {
     )
 }
 
-export default HomePage
+export default Home

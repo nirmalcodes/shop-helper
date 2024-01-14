@@ -4,8 +4,8 @@ import { Navigate, useLocation } from 'react-router-dom'
 import { FaEye, FaEyeSlash } from 'react-icons/fa6'
 import { validateForm } from '../../utils/helpers/validators/SignInUpFormValidator'
 
-const SignInPage = () => {
-    const { user, emailSignIn } = useContext(AuthContext)
+const SignUp = () => {
+    const { user, emailSignUp } = useContext(AuthContext)
     const location = useLocation()
 
     if (user && location.pathname !== '/') {
@@ -32,14 +32,14 @@ const SignInPage = () => {
         setIstoggled((prev) => !prev)
     }
 
-    const handleSignIn = async (e) => {
+    const handleSignUp = async (e) => {
         e.preventDefault()
 
         const validationErrors = validateForm(formData)
         setErrors(validationErrors)
 
         if (Object.keys(validationErrors).length === 0) {
-            await emailSignIn(formData.email, formData.password)
+            await emailSignUp(formData.email, formData.password)
         }
     }
 
@@ -50,11 +50,11 @@ const SignInPage = () => {
             }
         >
             <form
-                onSubmit={handleSignIn}
+                onSubmit={handleSignUp}
                 className="w-full max-w-[360px] rounded-lg bg-white p-4 shadow-md"
             >
                 <h4 className="mb-4 text-center text-2xl font-medium text-gray-700">
-                    Log In
+                    Sign Up
                 </h4>
                 <div className="mb-3">
                     <label
@@ -125,11 +125,11 @@ const SignInPage = () => {
                         'flex w-full justify-center rounded-lg border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium  text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:bg-indigo-700'
                     }
                 >
-                    Log In
+                    Sign Up
                 </button>
             </form>
         </div>
     )
 }
 
-export default SignInPage
+export default SignUp
