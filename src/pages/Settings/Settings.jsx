@@ -6,7 +6,7 @@ const Settings = () => {
     const tabs = [
         { id: 1, name: 'User Settings', path: '/settings/user_settings' },
         { id: 2, name: 'KOKO Settings', path: '/settings/koko_settings' },
-        { id: 3, name: 'Updates Settings', path: '' },
+        { id: 3, name: 'Updates Settings', path: '/settings/updates_settings' },
     ]
 
     return (
