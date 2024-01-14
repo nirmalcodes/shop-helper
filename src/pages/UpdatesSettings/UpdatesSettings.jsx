@@ -1,9 +1,11 @@
 import React from 'react'
+import { Breadcrumbs } from '../../components'
 
 const UpdatesSettings = () => {
     return (
         <>
-            <div>UpdatesSettings</div>
+            <Breadcrumbs />
+            <div className="container px-4 py-5">Updates Settings</div>
         </>
     )
 }
