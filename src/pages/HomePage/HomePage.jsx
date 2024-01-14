@@ -1,7 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { AuthContext } from '../../contexts/AuthContext'
 import { FaCalculator } from 'react-icons/fa6'
-import { StatCard, UpdateCard } from '../../components'
+import { StatCard } from '../../components'
+import { firestore } from '../../services/firebase/firebase'
 import {
     collection,
     doc,
@@ -10,7 +11,7 @@ import {
     orderBy,
     query,
 } from '@firebase/firestore'
-import { firestore } from '../../services/firebase/firebase'
+import { formatDateTime } from '../../utils/helpers/formatters/formatDateTime'
 
 const HomePage = () => {
     const { user, logOut } = useContext(AuthContext)
@@ -26,50 +27,33 @@ const HomePage = () => {
         'kokoConfigurations',
         'configData'
     )
-
-    const updatesCollectionRef = collection(firestore, 'updates')
-    // Function to fetch all documents from the "updates" collection
-    const fetchUpdates = async () => {
-        try {
-            // "desc" For descending order
-            // "asc" For ascending order
-            const q = query(
-                updatesCollectionRef,
-                orderBy('createdAt', 'desc'),
-                limit(5)
-            )
-
-            const unsubscribe = onSnapshot(q, (snapshot) => {
-                const updatesData = snapshot.docs.map((doc) => ({
-                    id: doc.id,
-                    ...doc.data(),
-                }))
-                setUpdates(updatesData)
-            })
-
-            // Clean up the listener when the component unmounts
-            return () => unsubscribe()
-        } catch (error) {
-            console.error('Error fetching messages:', error)
-        }
-    }
+    const updatesRef = collection(firestore, 'updates')
+    const q = query(updatesRef, orderBy('createdAt', 'desc'), limit(5))
 
     useEffect(() => {
-        const unsub = onSnapshot(kokoConfigurationsRef, (doc) => {
-            // console.log('Current data: ', doc.data())
+        const unsubKokoConfig = onSnapshot(kokoConfigurationsRef, (doc) => {
             const { discountMode } = doc.data()
             setStatCard((prevData) => ({
                 ...prevData,
                 value: discountMode ? 'Discount' : 'Default',
             }))
         })
-        fetchUpdates()
+
+        const unsubUpdates = onSnapshot(q, (snapshot) => {
+            const updatesData = snapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+            }))
+            setUpdates(updatesData)
+        })
+
         return () => {
-            unsub()
+            unsubKokoConfig()
+            unsubUpdates()
         }
     }, [])
 
-    console.log(updates)
+    // console.log(updates)
 
     return (
         <>
@@ -79,15 +63,28 @@ const HomePage = () => {
                 </div>
                 <div className="mb-5 flex flex-row flex-wrap items-center">
                     <div className="w-full rounded-lg bg-white p-4 shadow-md">
-                        <h3 className="mb-4 text-xl font-bold text-indigo-600">
+                        <h3 className="mb-2 text-xl font-bold text-indigo-600">
                             Recent Updates
                         </h3>
-                        <hr />
-                        <div className="flex flex-col gap-y-4 py-5">
+                        <hr className='border-t-2'/>
+                        <div className="flex flex-col divide-y">
                             {updates && updates.length > 0 ? (
-                                updates.map((update) => (
-                                    <UpdateCard data={update} key={update.id} />
-                                ))
+                                updates.map((update) => {
+                                    let timestamp = update?.createdAt?.seconds
+                                    return (
+                                        <div
+                                            className="px-2 py-4"
+                                            key={update?.id}
+                                        >
+                                            <p className="text-lg">
+                                                {update?.message}
+                                            </p>
+                                            <span className="inline-block text-xs text-slate-400">
+                                                {formatDateTime(timestamp)}
+                                            </span>
+                                        </div>
+                                    )
+                                })
                             ) : (
                                 <div className="grid min-h-[100px] place-items-center font-medium text-slate-500/50">
                                     No Updates to show
