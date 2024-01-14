@@ -6,16 +6,16 @@ import {
     FaGear,
 } from 'react-icons/fa6'
 
-const SignInPage = lazy(() => import('../pages/SignInPage/SignInPage'))
+const SignIn = lazy(() => import('../pages/SignIn/SignIn'))
 
-const HomePage = lazy(() => import('../pages/HomePage/HomePage'))
-const KOKOPage = lazy(() => import('../pages/KOKOPage/KOKOPage'))
-const UpdatesPage = lazy(() => import('../pages/UpdatesPage/UpdatesPage'))
+const Home = lazy(() => import('../pages/Home/Home'))
+const KOKO = lazy(() => import('../pages/KOKO/KOKO'))
+const Updates = lazy(() => import('../pages/Updates/Updates'))
 
-const SettingsPage = lazy(() => import('../pages/SettingsPage/SettingsPage'))
-const KOKOSettingsPage = lazy(
-    () => import('../pages/KOKOSettingsPage/KOKOSettingsPage')
-)
+const Settings = lazy(() => import('../pages/Settings/Settings'))
+const KOKOSettings = lazy(() => import('../pages/KOKOSettings/KOKOSettings'))
+const UserSettings = lazy(() => import('../pages/UserSettings/UserSettings'))
+const UpdatesSettings = lazy(() => import('../pages/UpdatesSettings/UpdatesSettings'))
 
 const ROUTES = [
     {
@@ -25,7 +25,7 @@ const ROUTES = [
         protected: false,
         path: '/signin',
         main: true,
-        component: SignInPage,
+        component: SignIn,
         hiddenInSidebar: true,
         children: [],
     },
@@ -36,7 +36,7 @@ const ROUTES = [
         protected: true,
         path: '/',
         main: true,
-        component: HomePage,
+        component: Home,
         hiddenInSidebar: false,
         children: [],
     },
@@ -47,7 +47,7 @@ const ROUTES = [
         protected: true,
         path: '/koko',
         main: true,
-        component: KOKOPage,
+        component: KOKO,
         hiddenInSidebar: false,
         children: [],
     },
@@ -58,7 +58,7 @@ const ROUTES = [
         protected: true,
         path: '/updates',
         main: true,
-        component: UpdatesPage,
+        component: Updates,
         hiddenInSidebar: false,
         children: [],
     },
@@ -69,7 +69,7 @@ const ROUTES = [
         protected: true,
         path: '/settings',
         main: true,
-        component: SettingsPage,
+        component: Settings,
         hiddenInSidebar: false,
         children: [
             {
@@ -78,7 +78,7 @@ const ROUTES = [
                 icon: false,
                 path: '/user_settings',
                 main: false,
-                component: KOKOSettingsPage,
+                component: UserSettings,
                 hiddenInSidebar: true,
                 children: [],
             },
@@ -88,7 +88,7 @@ const ROUTES = [
                 icon: false,
                 path: '/koko_settings',
                 main: false,
-                component: KOKOSettingsPage,
+                component: KOKOSettings,
                 hiddenInSidebar: true,
                 children: [],
             },
@@ -98,7 +98,7 @@ const ROUTES = [
                 icon: false,
                 path: '/Updates_settings',
                 main: false,
-                component: KOKOSettingsPage,
+                component: UpdatesSettings,
                 hiddenInSidebar: true,
                 children: [],
             },
