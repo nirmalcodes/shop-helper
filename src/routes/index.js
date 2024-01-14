@@ -96,7 +96,7 @@ const ROUTES = [
                 id: 3,
                 name: 'Updates Settings',
                 icon: false,
-                path: '/Updates_settings',
+                path: '/updates_settings',
                 main: false,
                 component: UpdatesSettings,
                 hiddenInSidebar: true,
