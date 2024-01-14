@@ -159,30 +159,19 @@ const UpdatesPage = () => {
         }
     }
 
-    // Function to fetch all documents from the "updates" collection
-    const fetchUpdates = async () => {
-        try {
-            // "desc" For descending order
-            // "asc" For ascending order
-            const q = query(updatesCollectionRef, orderBy('createdAt', 'asc'))
-
-            const unsubscribe = onSnapshot(q, (snapshot) => {
-                const updatesData = snapshot.docs.map((doc) => ({
-                    id: doc.id,
-                    ...doc.data(),
-                }))
-                setUpdates(updatesData)
-            })
-
-            // Clean up the listener when the component unmounts
-            return () => unsubscribe()
-        } catch (error) {
-            console.error('Error fetching messages:', error)
-        }
-    }
+    const q = query(updatesCollectionRef, orderBy('createdAt', 'asc'))
 
     useEffect(() => {
-        fetchUpdates()
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const updatesData = snapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+            }))
+            setUpdates(updatesData)
+        })
+        return () => {
+            unsubscribe()
+        }
     }, [])
 
     return (
