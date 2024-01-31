@@ -38,22 +38,26 @@ export const AuthProvider = ({ children }) => {
     }, [])
 
     const emailSignIn = async (email, password) => {
-        try {
-            await signInWithEmail(email, password)
-            // const userCredential = await signInWithEmail(email, password)
-            // setUser(userCredential.user)
-        } catch (error) {
-            // Handle sign-in error
-        }
+        await signInWithEmail(email, password)
+        // try {
+        // await signInWithEmail(email, password)
+        // const userCredential = await signInWithEmail(email, password)
+        // setUser(userCredential.user)
+        // } catch (error) {
+        // return error
+        // Handle sign-in error
+        // }
     }
 
     const emailSignUp = async (email, password) => {
-        try {
-            await signUpWithEmail(email, password)
-            // Handle successful registration
-        } catch (error) {
-            // Handle registration error
-        }
+        await signUpWithEmail(email, password)
+        // try {
+        // await signUpWithEmail(email, password)
+        // Handle successful registration
+        // } catch (error) {
+        // return error
+        // Handle registration error
+        // }
     }
 
     const updatePassword = async (newPassword) => {
