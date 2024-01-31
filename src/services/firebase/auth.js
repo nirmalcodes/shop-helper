@@ -7,16 +7,13 @@ import {
 } from '@firebase/auth'
 
 export const signUpWithEmail = async (email, password) => {
-    try {
-        const userCredential = await createUserWithEmailAndPassword(
-            auth,
-            email,
-            password
-        )
-        return userCredential.user
-    } catch (error) {
-        console.error('Error registering user:', error)
-    }
+    await createUserWithEmailAndPassword(auth, email, password)
+    // try {
+    // const userCredential = await createUserWithEmailAndPassword(auth,email,password)
+    // return userCredential.user
+    // } catch (error) {
+    // console.error('Error registering user:', error)
+    // }
 }
 
 export const signInWithEmail = async (email, password) => {
