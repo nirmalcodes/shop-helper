@@ -7,6 +7,7 @@ import {
 } from 'react-icons/fa6'
 
 const SignIn = lazy(() => import('../pages/SignIn/SignIn'))
+const SignUp = lazy(() => import('../pages/SignUp/SignUp'))
 
 const Home = lazy(() => import('../pages/Home/Home'))
 const KOKO = lazy(() => import('../pages/KOKO/KOKO'))
@@ -31,6 +32,17 @@ const ROUTES = [
     },
     {
         id: 2,
+        name: 'Sign Up',
+        icon: false,
+        protected: false,
+        path: '/signup',
+        main: true,
+        component: SignUp,
+        hiddenInSidebar: true,
+        children: [],
+    },
+    {
+        id: 3,
         name: 'Home',
         icon: FaHouse,
         protected: true,
@@ -41,7 +53,7 @@ const ROUTES = [
         children: [],
     },
     {
-        id: 3,
+        id: 4,
         name: 'KOKO',
         icon: FaCalculator,
         protected: true,
@@ -52,7 +64,7 @@ const ROUTES = [
         children: [],
     },
     {
-        id: 4,
+        id: 5,
         name: 'Updates',
         icon: FaEnvelopeOpenText,
         protected: true,
@@ -63,7 +75,7 @@ const ROUTES = [
         children: [],
     },
     {
-        id: 5,
+        id: 6,
         name: 'Settings',
         icon: FaGear,
         protected: true,
@@ -79,7 +91,7 @@ const ROUTES = [
                 path: '/user_settings',
                 main: false,
                 component: UserSettings,
-                hiddenInSidebar: true,
+                hiddenInSidAebar: true,
                 children: [],
             },
             {
