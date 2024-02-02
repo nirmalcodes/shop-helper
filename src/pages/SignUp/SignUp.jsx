@@ -35,18 +35,13 @@ const SignUp = () => {
         username: '',
         email: '',
         password: '',
+        common: '',
     })
 
     const handleInputChange = (e) => {
         const { name, value } = e.target
-        setFormData({
-            ...formData,
-            [name]: value,
-        })
-        setErrors({
-            ...errors,
-            [name]: '',
-        })
+        setFormData({ ...formData, [name]: value })
+        setErrors({ ...errors, [name]: '' })
     }
 
     const togglePassword = () => {
@@ -113,17 +108,13 @@ const SignUp = () => {
                 )
                 const rolesSnapshot = await getDocs(rolesQuery)
 
-                if (rolesSnapshot.empty) {
-                    console.error('User not allowed to sign up')
-                } else {
+                if (!rolesSnapshot.empty) {
                     let docData
                     rolesSnapshot.forEach((doc) => {
-                        // console.log(doc.id, ' => ', doc.data())
                         docData = {
                             id: doc.id,
                             ...doc.data(),
                         }
-                        // console.log('pre auth data ', docData)
                         return docData
                     })
 
@@ -149,13 +140,21 @@ const SignUp = () => {
                     await deleteDoc(oldDocRef)
                 }
 
-                setFormData({
-                    username: '',
-                    email: '',
-                    password: '',
-                })
+                setFormData({})
             } catch (error) {
-                console.error(error)
+                const errorCode = error.code
+
+                if (errorCode === 'auth/email-already-in-use') {
+                    setErrors((prevErrors) => ({
+                        ...prevErrors,
+                        email: 'This email is already in use',
+                    }))
+                } else {
+                    setErrors((prevErrors) => ({
+                        ...prevErrors,
+                        common: 'An error occurred. Please try again later',
+                    }))
+                }
             }
             setIsLoading(false)
         }
@@ -264,6 +263,11 @@ const SignUp = () => {
                         </span>
                     )}
                 </div>
+                {errors.common && (
+                    <span className="text-sm text-red-600">
+                        {errors.common}
+                    </span>
+                )}
                 <button
                     type="submit"
                     className={
