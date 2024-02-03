@@ -2,6 +2,12 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    //TODO : remove in future
+    match /configs/configData {
+      allow read: if true;
+      allow write: if request.auth.token.admin == true;
+    }
+
     match /siteConfigurations/configData {
       allow read;
     }
@@ -11,7 +17,7 @@ service cloud.firestore {
     }
 
     function getUserRole() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid).data.role);
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
     }
 
     function isRoot() {
@@ -39,11 +45,6 @@ service cloud.firestore {
     match /updates/{document=**} {
       allow read, write: if isRoot() || isAdmin();
       allow read: if isUser();
-    }
-
-    match /configs/{document=**} {
-      allow read: if true;
-      allow write: if request.auth.token.admin == true;
     }
   }
 }
