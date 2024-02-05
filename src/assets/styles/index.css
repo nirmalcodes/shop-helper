@@ -69,6 +69,25 @@ input[type='number'] {
     .error-mssg {
         @apply text-red-500;
     }
+
+    .mssg-card {
+        @apply flex max-w-[85%] flex-col gap-[6px];
+    }
+
+    .mssg-txt-card {
+        @apply w-fit rounded-md px-2 py-1 shadow-md;
+    }
+    .mssg-attachment-card {
+        @apply flex w-fit flex-wrap gap-1 rounded-md p-1 shadow-md;
+    }
+
+    .attachment-thumbnail {
+        @apply aspect-square h-[160px] max-w-[100dvh] flex-[1_1_100px] overflow-hidden md:h-[180px] xl:h-[200px];
+    }
+
+    .attachment-thumbnail img {
+        @apply h-full w-full rounded-md bg-gradient-to-tr from-gray-500 to-gray-100 object-cover object-left-top;
+    }
 }
 
 .scroll-area::-webkit-scrollbar {
