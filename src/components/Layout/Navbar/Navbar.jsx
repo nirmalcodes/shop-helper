@@ -1,9 +1,12 @@
-import React, { useContext } from 'react'
-import { FaBars, FaArrowRightFromBracket } from 'react-icons/fa6'
+import React, { useContext, useEffect, useState } from 'react'
+import { FaBars, FaArrowRightFromBracket, FaCircleUser } from 'react-icons/fa6'
 import { AuthContext } from '../../../contexts/AuthContext'
+import { firestore } from '../../../services/firebase/firebase'
+import { doc, getDoc } from '@firebase/firestore'
 
 const Navbar = ({ toggleOpen }) => {
     const { user, logOut } = useContext(AuthContext)
+    const [docData, setDocData] = useState({})
 
     const toggleSidebar = () => {
         toggleOpen((prev) => !prev)
@@ -12,6 +15,17 @@ const Navbar = ({ toggleOpen }) => {
     const handleLogOut = async () => {
         await logOut()
     }
+
+    const fetchUsername = async (userId) => {
+        const userDocRef = doc(firestore, 'users', userId)
+        const docSnap = await getDoc(userDocRef)
+        if (docSnap.exists()) {
+            setDocData({ ...docSnap.data() })
+        }
+    }
+    useEffect(() => {
+        fetchUsername(user?.uid)
+    }, [user])
 
     return (
         <>
@@ -24,7 +38,10 @@ const Navbar = ({ toggleOpen }) => {
                     <FaBars />
                 </button>
                 <div className="ml-auto flex items-center gap-x-4">
-                    <p className="">{user?.email}</p>
+                    <div className="flex items-center text-lg text-slate-700">
+                        <FaCircleUser className="mr-1" />
+                        {docData.username ?? '-'}
+                    </div>
                     <button
                         type="button"
                         onClick={handleLogOut}
