@@ -1,10 +1,12 @@
 import React, { useEffect, useRef } from 'react'
 
 const AutoResizeTextarea = ({
+    id,
     onChange,
     value,
     maxHeight = 160,
     className,
+    placeholder = '',
 }) => {
     const textareaRef = useRef(null)
 
@@ -29,10 +31,12 @@ const AutoResizeTextarea = ({
 
     return (
         <textarea
+            id={id}
             ref={textareaRef}
             rows="1"
             onChange={onChange}
             value={value}
+            placeholder={placeholder}
             style={{ maxHeight: `${maxHeight}px` }}
             className={`scroll-area m-0 w-full resize-none rounded-md border-none bg-slate-400/10 outline-none focus:ring-0 ${className}`}
         />
