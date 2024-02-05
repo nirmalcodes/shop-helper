@@ -1,12 +1,42 @@
 rules_version = '2';
-
-// Craft rules based on data in your Firestore database
-// allow write: if firestore.get(
-//    /databases/(default)/documents/users/$(request.auth.uid)).data.isAdmin;
 service firebase.storage {
   match /b/{bucket}/o {
-    match /{allPaths=**} {
-      allow read, write: if false;
+    
+    // Allow read access to siteConfigurations for anyone
+    match /siteConfigurations/{allPaths=**} {
+      allow read;
+    }
+
+    // Enforce role-based access for other files
+    function isRoot() {
+      return request.auth.token.role == "root";
+    }
+
+    function isAdmin() {
+      return request.auth.token.role == "admin";
+    }
+
+    function isUser() {
+      return request.auth.token.role == "user";
+    }
+
+    match /users/{userId}/{allPaths=**} {
+      allow read, write: if isRoot() || isAdmin();
+    }
+
+    match /kokoConfigurations/{allPaths=**} {
+      allow read, write: if isRoot() || isAdmin();
+      allow read: if isUser();
+    }
+
+    match /updates/{allPaths=**} {
+      allow read, write: if isRoot() || isAdmin();
+      allow read: if isUser();
+    }
+
+    match /messages/{allPaths=**} {
+      allow read, write: if isRoot() || isAdmin();
+      allow read: if isUser();
     }
   }
 }
