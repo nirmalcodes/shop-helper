@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react'
+import React, { Suspense, useEffect } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
@@ -7,6 +7,20 @@ import { ProtectedRoute } from './components'
 import ROUTES from './routes'
 
 const App = () => {
+    useEffect(() => {
+        const askForPermission = async () => {
+            const permission = await Notification.requestPermission()
+            if (permission === 'granted') {
+                console.log('Notification permission granted')
+            } else {
+                console.log('Notification permission denied')
+            }
+        }
+
+        if (Notification.permission !== 'granted') {
+            askForPermission()
+        }
+    }, [])
     return (
         <>
             <Suspense>
