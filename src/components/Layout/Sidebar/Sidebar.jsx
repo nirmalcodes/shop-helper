@@ -13,8 +13,13 @@ const Sidebar = ({ open = true, toggleOpen }) => {
     return (
         <>
             <aside className={`sidebar ${open && 'open'}`}>
-                <div className="flex h-14 flex-shrink-0 items-center justify-center gap-x-3 border-b text-4xl">
-                    <FaRegHandshake />
+                <div className="flex h-14 flex-shrink-0 items-center justify-center gap-x-3 border-b text-4xl p-2">
+                    <img
+                        src="/shop-helper-logo.png"
+                        alt="Shop Helper"
+                        loading="eager"
+                        width={44}
+                    />
                     {open && (
                         <div className={'hidden text-lg font-medium lg:block'}>
                             Shop Helper
