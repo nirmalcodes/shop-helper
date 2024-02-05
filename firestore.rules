@@ -46,5 +46,11 @@ service cloud.firestore {
       allow read, write: if isRoot() || isAdmin();
       allow read: if isUser();
     }
+
+    match /messages/{document=**} {
+      allow read, write: if isRoot() || isAdmin();
+      allow read: if isUser();
+    }
+
   }
 }
