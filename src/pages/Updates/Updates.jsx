@@ -1,10 +1,24 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { FaPlus, FaPaperPlane } from 'react-icons/fa6'
-import { auth, firestore, storage } from '../../services/firebase/firebase'
+import React, {
+    useContext,
+    useEffect,
+    useLayoutEffect,
+    useRef,
+    useState,
+} from 'react'
+import { AuthContext } from '../../contexts/AuthContext'
+import { firestore, storage } from '../../services/firebase/firebase'
+import {
+    FaCamera,
+    FaPaperPlane,
+    FaRegTrashCan,
+    FaRegComments,
+    FaCloudArrowUp,
+} from 'react-icons/fa6'
+import { AutoResizeTextarea, MessageCard } from '../../components'
+import imageCompression from 'browser-image-compression'
 import {
     addDoc,
     collection,
-    getDocs,
     onSnapshot,
     orderBy,
     query,
@@ -12,75 +26,111 @@ import {
     updateDoc,
 } from '@firebase/firestore'
 import { getDownloadURL, ref, uploadBytes } from '@firebase/storage'
-import imageCompression from 'browser-image-compression'
-import { AutoResizeTextarea, UpdateCard } from '../../components'
+
+const randomImage = () => {
+    const randomNumber = Math.floor(Math.random() * 100)
+    // console.log('rand numb: ', randomNumber)
+    const imgUrl = `https://picsum.photos/1280/720?random=${randomNumber}`
+    // console.log('random url: ', imgUrl)
+    return imgUrl
+}
+
+const messagesD = [
+    {
+        date: '03/02/2024',
+        messages: [
+            {
+                id: 1,
+                message:
+                    'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dignissimos quas, beatae id sit tempore, autem ut voluptatem corporis esse cupiditate omnis. Illum odio, facere explicabo odit incidunt porro ratione ea!',
+                attachment: [],
+                createdBy: 'user',
+                createdAt: '15:53:23 PM',
+            },
+        ],
+    },
+]
+
+export const PreviewTumbnails = ({ data = [] }) => {
+    return <></>
+}
 
 const Updates = () => {
-    const containerRef = useRef(null)
+    const { user } = useContext(AuthContext)
 
-    const [isHeight, setIsHeight] = useState(false)
-    const [formData, setFormData] = useState({
-        message: '',
-        fileAttachments: [],
-    })
-    const [updates, setUpdates] = useState([])
+    const msgContRef = useRef(null)
+    const fileInputRef = useRef(null)
+
+    const [isHeightDone, setIsHeightDone] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
+    const [messages, setMessages] = useState([])
+    const [message, setMessage] = useState('')
+    const [images, setImages] = useState([])
+    const [errorMessage, setErrorMessage] = useState('')
 
     useLayoutEffect(() => {
-        const containerEl = containerRef.current
+        const msgContEl = msgContRef.current
 
-        if (containerEl) {
-            const rect = containerEl.getBoundingClientRect()
+        if (msgContEl) {
+            const rect = msgContEl.getBoundingClientRect()
 
             const height = parseFloat(rect.height)
 
             if (height) {
-                containerEl.style.maxHeight = `${height}px`
+                msgContEl.style.maxHeight = `${height}px`
             }
 
-            setIsHeight(true)
+            setIsHeightDone(true)
         }
 
         return () => {}
     }, [])
 
     const handleMessageChange = (e) => {
-        setFormData({ ...formData, message: e.target.value })
+        setMessage(e.target.value)
     }
 
-    const handleFileChange = (e) => {
-        const maxSize = 8
-        const files = Array.from(e.target.files)
+    const handleImageChange = (e) => {
+        const maxSize = 6
+        const maxAttachments = 4
 
-        console.log('Selected Files: ', files)
+        const selectedFiles = Array.from(e.target.files)
+        const newImages = []
 
-        // Validate file size
-        const validFiles = files.filter(
-            (file) => file.size <= maxSize * 1024 * 1024
-        ) // 4 MB
+        for (const file of selectedFiles) {
+            if (!file.type.startsWith('image/')) {
+                setErrorMessage('Only images are allowed.')
+                return
+            }
 
-        if (validFiles.length !== files.length) {
-            alert(`Some files exceed the ${maxSize}MB limit.`)
+            if (file.size > maxSize * 1024 * 1024) {
+                setErrorMessage(
+                    `File "${file.name}" is too large (maximum file size is ${maxSize}MB).`
+                )
+                return
+            }
+
+            if (images.length + newImages.length >= 4) {
+                setErrorMessage(`Maximum ${maxAttachments} images allowed.`)
+                return
+            }
+
+            newImages.push(file)
         }
 
-        setFormData({ ...formData, fileAttachments: validFiles })
+        setImages([...images, ...newImages])
+        setErrorMessage('')
     }
 
-    const handleImageUpload = async (imageFile) => {
-        // Check if the image exceeds 4MB
-        if (imageFile.size > 4 * 1024 * 1024) {
-            // Compress the image
-            const compressedImage = await compressImage(imageFile)
-            return compressedImage
-        } else {
-            // If the image is already below 4MB, return the original image
-            return imageFile
-        }
+    const handleImageRemove = (index) => {
+        setImages([...images.slice(0, index), ...images.slice(index + 1)])
+        fileInputRef.current.value = ''
     }
 
     const compressImage = async (imageFile) => {
         const options = {
-            maxSizeMB: 1, // Set your desired max size in MB
-            maxWidthOrHeight: 1920, // Set your desired max width or height
+            maxSizeMB: 1, // Set max size you want in MB
+            maxWidthOrHeight: 1920, // Set max width or height you want
         }
 
         try {
@@ -92,82 +142,60 @@ const Updates = () => {
         }
     }
 
-    const updatesCollectionRef = collection(firestore, 'updates')
+    const messagesCollectionRef = collection(firestore, 'messages')
+    const orderedQuery = query(
+        messagesCollectionRef,
+        orderBy('createdAt', 'asc')
+    )
 
     const handleSubmit = async (e) => {
         e.preventDefault()
+        setIsLoading(true)
 
         try {
-            // Get current user id
-
-            let userId
-
-            if (auth.currentUser) {
-                userId = auth.currentUser.uid
-            }
-            console.log('Creating Update by Current User: ', userId)
-
-            const docData = {
+            // Add message to the messages collection
+            const docRef = await addDoc(messagesCollectionRef, {
+                message: message,
+                attachments: [],
+                createdBy: user.uid,
                 createdAt: serverTimestamp(),
-                createdBy: userId,
-                message: formData.message,
-            }
+            })
 
-            // Add update to the updates collection
-            const docRef = await addDoc(updatesCollectionRef, docData)
-
-            // Update the added doc with the docID field
-            // await updateDoc(docRef, { docID: docRef.id })
-
-            console.log('Document written with ID: ', docRef.id)
-
+            // Handle attachments upload
             let attachmentURLs = []
 
-            if (formData.fileAttachments.length > 0) {
-                for (const file of formData.fileAttachments) {
-                    if (file.type.startsWith('image')) {
-                        const compressedFile = await compressImage(file)
-                        const storageRef = ref(
-                            storage,
-                            `updates/${docRef.id}/${compressedFile.name}`
-                        )
-                        await uploadBytes(storageRef, compressedFile)
-                        const downloadURL = await getDownloadURL(storageRef)
-                        attachmentURLs.push(downloadURL)
-                    } else {
-                        const storageRef = ref(
-                            storage,
-                            `updates/${docRef.id}/${file.name}`
-                        )
-                        await uploadBytes(storageRef, file)
-                        const downloadURL = await getDownloadURL(storageRef)
-                        attachmentURLs.push(downloadURL)
-                    }
+            if (images.length > 0) {
+                for (const file of images) {
+                    const compressedFile = await compressImage(file)
+                    const storageRef = ref(
+                        storage,
+                        `messages/${docRef.id}/${compressedFile.name}`
+                    )
+                    await uploadBytes(storageRef, compressedFile)
+                    const downloadURL = await getDownloadURL(storageRef)
+                    attachmentURLs.push(downloadURL)
                 }
             }
 
             // Updated the added doc with URLs for attached files
-            await updateDoc(docRef, { fileAttachments: attachmentURLs })
+            await updateDoc(docRef, { attachments: attachmentURLs })
 
-            // Clear form data
-            setFormData({ message: '', fileAttachments: [] })
-
-            // alert('Update message sent successfully!')
+            // Clear form
+            setMessage('')
+            setImages([])
         } catch (error) {
             console.error('Error sending message:', error)
-            // alert('An error occurred while sending the message.')
         }
+        setIsLoading(false)
     }
 
-    const q = query(updatesCollectionRef, orderBy('createdAt', 'asc'))
-
     useEffect(() => {
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            const updatesData = snapshot.docs.map((doc) => ({
+        const unsubscribe = onSnapshot(orderedQuery, (snapshot) => {
+            const messagesData = snapshot.docs.map((doc) => ({
                 id: doc.id,
                 ...doc.data(),
             }))
-            setUpdates(updatesData)
+            setMessages(messagesData)
         })
         return () => {
             unsubscribe()
@@ -177,58 +205,115 @@ const Updates = () => {
     return (
         <>
             <div
-                className="scroll-area container relative mb-16 flex-1 overflow-hidden overflow-y-auto scroll-smooth bg-green-300/0 px-4 py-5"
-                ref={containerRef}
+                className="relative mb-[64px] flex flex-[1_1_0] flex-col gap-4 overflow-hidden overflow-y-auto bg-gradient-to-br from-sky-200 via-sky-100 to-sky-50 px-4 py-3"
+                ref={msgContRef}
             >
-                {isHeight &&
-                    updates.map((updateDoc) => (
-                        <UpdateCard key={updateDoc?.id} update={updateDoc} />
+                {isHeightDone &&
+                    (messages.length > 0 ? (
+                        messages.map((message) => (
+                            <MessageCard
+                                key={message?.id}
+                                userID={message?.createdBy}
+                                message={message?.message}
+                                attachments={message?.attachments}
+                                timestamp={message?.createdAt?.seconds}
+                            />
+                        ))
+                    ) : (
+                        <div className="flex flex-1 flex-col items-center justify-center text-gray-400">
+                            <FaRegComments className="text-7xl" />
+                            <p className="text-lg">
+                                Looks like messages are empty.
+                            </p>
+                        </div>
                     ))}
             </div>
+            {/* inputs */}
+            <div className="absolute inset-x-0 bottom-0 z-50 border-t bg-white">
+                {/* previews */}
+                {images.length > 0 && (
+                    <div className="flex flex-wrap gap-1 border-b bg-red-300/0 px-3 py-2">
+                        {images.map((image, index) => (
+                            <div
+                                className="relative aspect-square h-[100px] max-w-[100dvh] overflow-hidden rounded md:h-[120px] xl:h-[150px]"
+                                key={index}
+                            >
+                                <button
+                                    type="button"
+                                    className="absolute inset-0 flex items-center justify-center bg-black/15 text-3xl text-white transition-colors duration-150 ease-in hover:bg-black/25"
+                                    onClick={() => handleImageRemove(index)}
+                                    disabled={isLoading}
+                                >
+                                    {isLoading ? (
+                                        <div className="animate-bounce">
+                                            <FaCloudArrowUp className="animate-pulse" />
+                                        </div>
+                                    ) : (
+                                        <FaRegTrashCan />
+                                    )}
+                                </button>
+                                <img
+                                    src={URL.createObjectURL(image)}
+                                    alt={image.name}
+                                    loading="lazy"
+                                    className="h-full w-full bg-gradient-to-tr from-gray-500 to-gray-100 object-cover object-left-top"
+                                />
+                            </div>
+                        ))}
+                    </div>
+                )}
+                {errorMessage && (
+                    <span className="px-3 text-sm text-red-600">
+                        {errorMessage}
+                    </span>
+                )}
 
-            <form
-                onSubmit={handleSubmit}
-                className="absolute inset-x-0 bottom-0 z-50 flex min-h-[64px] items-end border-t bg-white px-2 py-3 md:px-4"
-            >
-                <div className="hidden">
-                    <label
-                        htmlFor="attachFiles"
-                        className="flex h-[36px] w-[36px] flex-shrink-0 cursor-pointer items-center justify-center rounded-full p-2 hover:bg-slate-400/10 md:h-[40px] md:w-[40px]"
-                    >
-                        <FaPlus className="text-xl md:text-2xl" />
-                    </label>
-                    <input
-                        type="file"
-                        name="attachFiles"
-                        id="attachFiles"
-                        className="hidden"
-                        accept="image/*,.pdf,.docx"
-                        multiple
-                        onChange={handleFileChange}
-                    />
-                </div>
-                <div className="mx-[6px] flex flex-1 items-end md:mx-3">
-                    <AutoResizeTextarea
-                        onChange={handleMessageChange}
-                        value={formData.message}
-                    />
-                </div>
-                <div>
-                    <button
-                        disabled={
-                            formData.fileAttachments.length === 0 &&
-                            formData.message === ''
-                                ? true
-                                : false
-                        }
-                        type="submit"
-                        // onClick={addNewUpdate}
-                        className="flex h-[36px] w-[36px] flex-shrink-0 cursor-pointer items-center justify-center rounded-full p-2 hover:bg-slate-400/10 disabled:cursor-not-allowed disabled:text-slate-400 disabled:hover:bg-transparent md:h-[40px] md:w-[40px]"
-                    >
-                        <FaPaperPlane className="text-xl md:text-2xl" />
-                    </button>
-                </div>
-            </form>
+                {/* form */}
+                <form
+                    onSubmit={handleSubmit}
+                    className="flex min-h-[64px] w-full flex-1 items-end px-2 py-3 md:px-4"
+                >
+                    {/* attachment input */}
+                    <div>
+                        <label
+                            htmlFor="attachFiles"
+                            className={`flex h-[36px] w-[36px] flex-shrink-0 cursor-pointer items-center justify-center rounded-full p-2 hover:bg-slate-400/10 md:h-[40px] md:w-[40px]`}
+                        >
+                            <FaCamera className="text-xl md:text-2xl" />
+                        </label>
+                        <input
+                            type="file"
+                            id="attachFiles"
+                            ref={fileInputRef}
+                            multiple
+                            onChange={handleImageChange}
+                            accept="image/*"
+                            className="hidden"
+                        />
+                    </div>
+                    {/* text input */}
+                    <div className="mx-[6px] flex flex-1 items-end md:mx-3">
+                        <AutoResizeTextarea
+                            id="message"
+                            placeholder="Message"
+                            value={message}
+                            onChange={handleMessageChange}
+                        />
+                    </div>
+                    {/* send btn */}
+                    <div>
+                        <button
+                            type="submit"
+                            disabled={
+                                message === '' && images.length === 0 && true
+                            }
+                            className="flex h-[36px] w-[36px] flex-shrink-0 cursor-pointer items-center justify-center rounded-full p-2 hover:bg-slate-400/10 disabled:cursor-not-allowed disabled:text-slate-400 disabled:hover:bg-transparent md:h-[40px] md:w-[40px]"
+                        >
+                            <FaPaperPlane className="text-xl md:text-2xl" />
+                        </button>
+                    </div>
+                </form>
+            </div>
         </>
     )
 }
