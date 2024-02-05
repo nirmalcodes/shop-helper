@@ -15,11 +15,6 @@ import { formatDateTime } from '../../utils/helpers/formatters/formatDateTime'
 
 const Home = () => {
     const { user, logOut } = useContext(AuthContext)
-    const [latestMessage, setLatestMessage] = useState(
-        localStorage.getItem('lastMessageId')
-            ? localStorage.getItem('lastMessageId')
-            : null
-    )
     const [statCard, setStatCard] = useState({
         name: 'KOKO Calc Mode',
         value: '-',
@@ -34,7 +29,6 @@ const Home = () => {
     )
     const updatesRef = collection(firestore, 'messages')
     const q = query(updatesRef, orderBy('createdAt', 'desc'), limit(5))
-    const notiQ = query(updatesRef, orderBy('createdAt', 'desc'), limit(1))
 
     useEffect(() => {
         const unsubKokoConfig = onSnapshot(kokoConfigurationsRef, (doc) => {
@@ -53,36 +47,13 @@ const Home = () => {
             setUpdates(updatesData)
         })
 
-        const unsubscribe = onSnapshot(notiQ, (snapshot) => {
-            const newMessage = snapshot.docs[0]
-            if (newMessage && newMessage.id !== latestMessage) {
-                const messageData = newMessage.data()
-                showNotification(
-                    'New Message!',
-                    messageData.message ?? 'You have new message.'
-                )
-                setLatestMessage(newMessage.id)
-                localStorage.setItem('lastMessageId', newMessage.id)
-            }
-        })
-
         return () => {
             unsubKokoConfig()
             unsubUpdates()
-            unsubscribe()
         }
     }, [])
 
-    function showNotification(title, message) {
-        if (Notification.permission === 'granted') {
-            new Notification(title, {
-                body: message,
-                icon: 'android-chrome-192x192.png',
-            })
-        } else {
-            console.error('Notification permission denied')
-        }
-    }
+    // console.log(updates)
 
     return (
         <>
