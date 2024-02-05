@@ -15,6 +15,11 @@ import { formatDateTime } from '../../utils/helpers/formatters/formatDateTime'
 
 const Home = () => {
     const { user, logOut } = useContext(AuthContext)
+    const [latestMessage, setLatestMessage] = useState(
+        localStorage.getItem('lastMessageId')
+            ? localStorage.getItem('lastMessageId')
+            : null
+    )
     const [statCard, setStatCard] = useState({
         name: 'KOKO Calc Mode',
         value: '-',
@@ -27,8 +32,9 @@ const Home = () => {
         'kokoConfigurations',
         'configData'
     )
-    const updatesRef = collection(firestore, 'updates')
+    const updatesRef = collection(firestore, 'messages')
     const q = query(updatesRef, orderBy('createdAt', 'desc'), limit(5))
+    const notiQ = query(updatesRef, orderBy('createdAt', 'desc'), limit(1))
 
     useEffect(() => {
         const unsubKokoConfig = onSnapshot(kokoConfigurationsRef, (doc) => {
@@ -47,13 +53,36 @@ const Home = () => {
             setUpdates(updatesData)
         })
 
+        const unsubscribe = onSnapshot(notiQ, (snapshot) => {
+            const newMessage = snapshot.docs[0]
+            if (newMessage && newMessage.id !== latestMessage) {
+                const messageData = newMessage.data()
+                showNotification(
+                    'New Message!',
+                    messageData.message ?? 'You have new message.'
+                )
+                setLatestMessage(newMessage.id)
+                localStorage.setItem('lastMessageId', newMessage.id)
+            }
+        })
+
         return () => {
             unsubKokoConfig()
             unsubUpdates()
+            unsubscribe()
         }
     }, [])
 
-    // console.log(updates)
+    function showNotification(title, message) {
+        if (Notification.permission === 'granted') {
+            new Notification(title, {
+                body: message,
+                icon: 'android-chrome-192x192.png',
+            })
+        } else {
+            console.error('Notification permission denied')
+        }
+    }
 
     return (
         <>
@@ -66,7 +95,7 @@ const Home = () => {
                         <h3 className="mb-2 text-xl font-bold text-indigo-600">
                             Recent Updates
                         </h3>
-                        <hr className='border-t-2'/>
+                        <hr className="border-t-2" />
                         <div className="flex flex-col divide-y">
                             {updates && updates.length > 0 ? (
                                 updates.map((update) => {
@@ -79,9 +108,9 @@ const Home = () => {
                                             <p className="text-lg">
                                                 {update?.message}
                                             </p>
-                                            <span className="inline-block text-xs text-slate-400">
+                                            {/* <span className="inline-block text-xs text-slate-400">
                                                 {formatDateTime(timestamp)}
-                                            </span>
+                                            </span> */}
                                         </div>
                                     )
                                 })
