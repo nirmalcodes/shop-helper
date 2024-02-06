@@ -78,7 +78,10 @@ input[type='number'] {
         @apply w-fit rounded-md px-2 py-1 shadow-md;
     }
     .mssg-attachment-card {
-        @apply flex w-fit flex-wrap gap-1 rounded-md p-1 shadow-md;
+        @apply flex w-fit flex-col rounded-md p-1 shadow-md;
+    }
+    .attachment-wrapper {
+        @apply flex w-fit flex-wrap gap-1;
     }
 
     .attachment-thumbnail {
