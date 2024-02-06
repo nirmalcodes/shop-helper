@@ -455,6 +455,9 @@ const UserSettings = () => {
                 />
                 <DeleteModal
                     isOpen={isDltOpen}
+                    message={
+                        'This action cannot be undone. All settings associated with this user will be lost.'
+                    }
                     onClose={closeDltModal}
                     onConfirm={handleDltUser}
                     state={isLoading}
