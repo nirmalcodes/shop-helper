@@ -31,7 +31,7 @@ const MessageCard = ({ userID, message, timestamp, attachments = [] }) => {
         fetchUsername()
 
         messageRef.current?.scrollIntoView({ behavior: 'smooth' })
-    }, [user])
+    }, [])
 
     return (
         <>
