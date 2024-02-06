@@ -27,14 +27,6 @@ import {
 } from '@firebase/firestore'
 import { getDownloadURL, ref, uploadBytes } from '@firebase/storage'
 
-const randomImage = () => {
-    const randomNumber = Math.floor(Math.random() * 100)
-    // console.log('rand numb: ', randomNumber)
-    const imgUrl = `https://picsum.photos/1280/720?random=${randomNumber}`
-    // console.log('random url: ', imgUrl)
-    return imgUrl
-}
-
 export const PreviewTumbnails = ({ data = [] }) => {
     return <></>
 }
@@ -48,7 +40,9 @@ const Updates = () => {
     const [isHeightDone, setIsHeightDone] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
     const [imgUploaded, setImgUploaded] = useState(false)
+
     const [messages, setMessages] = useState([])
+
     const [message, setMessage] = useState('')
     const [images, setImages] = useState([])
     const [errorMessage, setErrorMessage] = useState('')
@@ -76,7 +70,7 @@ const Updates = () => {
     }
 
     const handleImageChange = (e) => {
-        const maxSize = 6
+        const maxSize = 7
         const maxAttachments = 4
 
         const selectedFiles = Array.from(e.target.files)
@@ -122,7 +116,7 @@ const Updates = () => {
             const compressedFile = await imageCompression(imageFile, options)
             return compressedFile
         } catch (error) {
-            console.error('Error compressing image:', error)
+            // console.error('Error compressing image:', error)
             return null
         }
     }
@@ -172,7 +166,7 @@ const Updates = () => {
             setMessage('')
             setImages([])
         } catch (error) {
-            console.error('Error sending message:', error)
+            // console.error('Error sending message:', error)
         }
         setIsLoading(false)
     }
@@ -201,6 +195,7 @@ const Updates = () => {
                         messages.map((message) => (
                             <MessageCard
                                 key={message?.id}
+                                messageId={message?.id}
                                 userID={message?.createdBy}
                                 message={message?.message}
                                 attachments={message?.attachments}
