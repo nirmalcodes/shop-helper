@@ -2,7 +2,13 @@ import React, { Fragment } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { FaTriangleExclamation } from 'react-icons/fa6'
 
-const DeleteModal = ({ isOpen, onClose, onConfirm, state }) => {
+const DeleteModal = ({
+    isOpen,
+    onClose,
+    onConfirm,
+    message = 'This action cannot be undone.',
+    state,
+}) => {
     return (
         <>
             <Transition appear show={isOpen} as={Fragment}>
@@ -42,11 +48,7 @@ const DeleteModal = ({ isOpen, onClose, onConfirm, state }) => {
                                         <h3 className="mb-2 text-center text-lg font-medium leading-6 text-gray-900">
                                             Are you sure?
                                         </h3>
-                                        <p className="text-center">
-                                            This action cannot be undone. All
-                                            settings associated with this user
-                                            will be lost.
-                                        </p>
+                                        <p className="text-center">{message}</p>
                                         <div className="mt-7 flex gap-3">
                                             <button
                                                 type="button"
