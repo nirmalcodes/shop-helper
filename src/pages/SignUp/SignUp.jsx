@@ -63,7 +63,6 @@ const SignUp = () => {
     }
 
     const accessGrantedUsers = collection(firestore, 'accessGrantedUsers')
-    const usersCollectionRef = collection(firestore, 'users')
 
     const handleSignUp = async (e) => {
         e.preventDefault()
@@ -87,11 +86,6 @@ const SignUp = () => {
                 'Password must be at least 8 characters, including at least one uppercase letter, one lowercase letter, one number, and one special character'
         }
 
-        // const rolesQuery = query(
-        //     usersCollectionRef,
-        //     where('email', '==', formData.email)
-        // )
-
         const rolesQuery = query(
             accessGrantedUsers,
             where('email', '==', formData.email)
@@ -108,11 +102,6 @@ const SignUp = () => {
             setIsLoading(false)
         } else {
             try {
-                // const rolesQuery = query(
-                //     usersCollectionRef,
-                //     where('email', '==', formData.email)
-                // )
-
                 const rolesQuery = query(
                     accessGrantedUsers,
                     where('email', '==', formData.email)
@@ -151,21 +140,6 @@ const SignUp = () => {
                         formData.email,
                         formData.password
                     )
-
-                    // const docRef = doc(usersCollectionRef, registeredId)
-
-                    // await setDoc(docRef, {
-                    //     username: formData.username,
-                    //     email: formData.email,
-                    //     role: docData.role,
-                    //     createdBy: docData.createdBy,
-                    //     createdAt: docData.createdAt,
-                    //     registeredAt: serverTimestamp(),
-                    //     restricted: false,
-                    // })
-
-                    // const oldDocRef = doc(usersCollectionRef, docData.id)
-                    // await deleteDoc(oldDocRef)
                 }
 
                 setFormData({})
