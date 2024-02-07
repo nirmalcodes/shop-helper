@@ -89,16 +89,8 @@ const UserSettings = () => {
         return emailRegex.test(email)
     }
 
-    // const usersCollectionRef = collection(firestore, 'users')
     const accessGrantedUsers = collection(firestore, 'accessGrantedUsers')
 
-    // const dataQ = query(usersCollectionRef, orderBy('email'))
-
-    // const filteredQ = query(
-    //     usersCollectionRef,
-    //     where('restricted', '==', false),
-    //     orderBy('email')
-    // )
     const filteredQ = query(
         accessGrantedUsers,
         where('restricted', '==', false),
@@ -120,10 +112,6 @@ const UserSettings = () => {
             validationErrors.role = 'Please choose a role'
         }
 
-        // const rolesQuery = query(
-        //     usersCollectionRef,
-        //     where('email', '==', formData.email)
-        // )
         const rolesQuery = query(
             accessGrantedUsers,
             where('email', '==', formData.email)
@@ -146,7 +134,6 @@ const UserSettings = () => {
                     createdAt: serverTimestamp(),
                     restricted: false,
                 }
-                // await addDoc(usersCollectionRef, docData)
                 await addDoc(accessGrantedUsers, docData)
 
                 setFormData({
