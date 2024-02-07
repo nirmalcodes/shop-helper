@@ -2,7 +2,15 @@ import React, { Fragment, useContext, useEffect, useRef, useState } from 'react'
 import { AuthContext } from '../../contexts/AuthContext'
 
 import { firestore, storage } from '../../services/firebase/firebase'
-import { deleteDoc, doc, getDoc } from '@firebase/firestore'
+import {
+    collection,
+    deleteDoc,
+    doc,
+    getDoc,
+    getDocs,
+    query,
+    where,
+} from '@firebase/firestore'
 import { deleteObject, listAll, ref } from '@firebase/storage'
 
 import { formatDateTime } from '../../utils/helpers/formatters/formatDateTime'
@@ -11,7 +19,7 @@ import DeleteModal from '../Modals/DeleteModal/DeleteModal'
 import { Menu, Transition } from '@headlessui/react'
 
 const MessageCard = ({
-    userID,
+    createdBy,
     messageId,
     message,
     timestamp,
@@ -32,18 +40,30 @@ const MessageCard = ({
     useEffect(() => {
         const fetchUsername = async () => {
             try {
-                const docRef = doc(firestore, 'users', userID)
-                const docSnap = await getDoc(docRef)
+                const usersCollectionRef = collection(firestore, 'users')
+                const rolesQuery = query(
+                    usersCollectionRef,
+                    where('email', '==', createdBy)
+                )
+                const rolesSnapshot = await getDocs(rolesQuery)
 
-                if (docSnap.exists()) {
-                    setUsername(docSnap.data().username)
+                if (!rolesSnapshot.empty) {
+                    let docData
+                    rolesSnapshot.forEach((doc) => {
+                        docData = {
+                            id: doc.id,
+                            ...doc.data(),
+                        }
+                        return docData
+                    })
+                    setUsername(docData.username)
                 }
             } catch (error) {
                 console.error('Error fetching username:', error)
             }
         }
 
-        if (userID === user.uid) {
+        if (createdBy === user.email) {
             setOwn(true)
         }
 
