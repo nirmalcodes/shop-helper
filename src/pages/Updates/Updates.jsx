@@ -157,7 +157,7 @@ const Updates = () => {
             const docRef = await setDoc(newDocRef, {
                 message: message,
                 attachments: attachmentURLs,
-                createdBy: user.uid,
+                createdBy: user.email,
                 createdAt: serverTimestamp(),
             })
 
@@ -196,7 +196,7 @@ const Updates = () => {
                             <MessageCard
                                 key={message?.id}
                                 messageId={message?.id}
-                                userID={message?.createdBy}
+                                createdBy={message?.createdBy}
                                 message={message?.message}
                                 attachments={message?.attachments}
                                 timestamp={message?.createdAt?.seconds}
