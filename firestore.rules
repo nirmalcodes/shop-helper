@@ -71,9 +71,8 @@ service cloud.firestore {
     
     match /messages/{document=**} {
       allow read: if isUser();
-      allow create, read: if isRoot() || isAdmin();
-      allow create: if request.auth.uid == resource.id;
-      allow read, write, delete: if isSignedIn() && request.auth.uid == resource.id;
+      allow create, read, write: if isRoot() || isAdmin();
+      allow delete: if (isRoot() || isAdmin()) && resource.data.createdBy == request.auth.email;
     }
 
   }
