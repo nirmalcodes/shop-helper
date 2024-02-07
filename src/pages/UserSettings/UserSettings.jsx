@@ -1,6 +1,6 @@
 import React, { Fragment, lazy, useContext, useEffect, useState } from 'react'
 import { Breadcrumbs } from '../../components'
-import { FaTrashCan, FaPen, FaTriangleExclamation } from 'react-icons/fa6'
+import { FaTrashCan, FaPen } from 'react-icons/fa6'
 import { Dialog, Transition } from '@headlessui/react'
 import { data } from '../../utils/constants'
 import { AuthContext } from '../../contexts/AuthContext'
@@ -89,10 +89,18 @@ const UserSettings = () => {
         return emailRegex.test(email)
     }
 
-    const usersCollectionRef = collection(firestore, 'users')
+    // const usersCollectionRef = collection(firestore, 'users')
+    const accessGrantedUsers = collection(firestore, 'accessGrantedUsers')
+
     // const dataQ = query(usersCollectionRef, orderBy('email'))
+
+    // const filteredQ = query(
+    //     usersCollectionRef,
+    //     where('restricted', '==', false),
+    //     orderBy('email')
+    // )
     const filteredQ = query(
-        usersCollectionRef,
+        accessGrantedUsers,
         where('restricted', '==', false),
         orderBy('email')
     )
@@ -112,8 +120,12 @@ const UserSettings = () => {
             validationErrors.role = 'Please choose a role'
         }
 
+        // const rolesQuery = query(
+        //     usersCollectionRef,
+        //     where('email', '==', formData.email)
+        // )
         const rolesQuery = query(
-            usersCollectionRef,
+            accessGrantedUsers,
             where('email', '==', formData.email)
         )
         const rolesSnapshot = await getDocs(rolesQuery)
@@ -127,21 +139,15 @@ const UserSettings = () => {
             setIsLoading(false)
         } else {
             try {
-                let userId, userMail
-
-                if (auth.currentUser) {
-                    userId = auth.currentUser.uid
-                    userMail = auth.currentUser.email
-                }
-
                 const docData = {
                     email: formData.email,
                     role: formData.role,
-                    createdBy: userId,
+                    createdBy: user.email,
                     createdAt: serverTimestamp(),
                     restricted: false,
                 }
-                await addDoc(usersCollectionRef, docData)
+                // await addDoc(usersCollectionRef, docData)
+                await addDoc(accessGrantedUsers, docData)
 
                 setFormData({
                     email: '',
@@ -150,9 +156,9 @@ const UserSettings = () => {
                 setIsLoading(false)
                 setIsAddOpen(false)
             } catch (error) {
-                console.error(error.code)
-                const errorCode = error.code
                 setIsLoading(false)
+                console.error(error)
+                const errorCode = error.code
             }
         }
     }
@@ -162,7 +168,8 @@ const UserSettings = () => {
         // console.log(`Editing user with ID: ${documentId}`)
         setIsLoading(true)
 
-        const docRef = doc(firestore, 'users', documentId)
+        // const docRef = doc(firestore, 'users', documentId)
+        const docRef = doc(firestore, 'accessGrantedUsers', documentId)
 
         try {
             // console.log('new role ', formData.role)
@@ -181,7 +188,8 @@ const UserSettings = () => {
         // console.log(`Deleting user with ID: ${documentId}`)
         setIsLoading(true)
 
-        const docRef = doc(firestore, 'users', documentId)
+        // const docRef = doc(firestore, 'users', documentId)
+        const docRef = doc(firestore, 'accessGrantedUsers', documentId)
 
         try {
             await deleteDoc(docRef)
