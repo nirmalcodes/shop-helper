@@ -52,7 +52,7 @@ service cloud.firestore {
     // Restrict users collection access
     match /users/{userId} {
       // Only signed-in users can create documents
-      allow create: if isSignedIn();
+      allow create, read: if isSignedIn();
       // Document name must match user ID
       allow create: if request.auth.uid == resource.id;
       // Users can only access their own document
