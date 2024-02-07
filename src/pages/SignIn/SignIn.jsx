@@ -1,13 +1,14 @@
 import React, { useContext, useState } from 'react'
 import { AuthContext } from '../../contexts/AuthContext'
-import { Navigate, useLocation } from 'react-router-dom'
+import { Link, Navigate, useLocation } from 'react-router-dom'
 import { FaEye, FaEyeSlash } from 'react-icons/fa6'
 import { validateForm } from '../../utils/helpers/validators/SignInUpFormValidator'
 import { signInWithEmailAndPassword } from '@firebase/auth'
-import { auth } from '../../services/firebase/firebase'
+import { auth, firestore } from '../../services/firebase/firebase'
+import { collection, getDocs, query, where } from '@firebase/firestore'
 
 const SignIn = () => {
-    const { user, emailSignIn } = useContext(AuthContext)
+    const { user } = useContext(AuthContext)
     const location = useLocation()
 
     if (user && location.pathname !== '/') {
@@ -48,6 +49,8 @@ const SignIn = () => {
         return passwordRegex.test(password)
     }
 
+    const accessGrantedUsers = collection(firestore, 'accessGrantedUsers')
+
     const handleSignIn = async (e) => {
         e.preventDefault()
         setIsLoading(true)
@@ -65,6 +68,17 @@ const SignIn = () => {
             validationErrors.password = 'Password is required'
         } else if (!isValidPassword(formData.password)) {
             validationErrors.password = 'Password must be at least 8 characters'
+        }
+
+        const rolesQuery = query(
+            accessGrantedUsers,
+            where('email', '==', formData.email)
+        )
+        const rolesSnapshot = await getDocs(rolesQuery)
+
+        if (rolesSnapshot.empty) {
+            validationErrors.email =
+                "You can't sign in with this email. Please contact your Admin"
         }
 
         if (Object.keys(validationErrors).length > 0) {
@@ -89,7 +103,7 @@ const SignIn = () => {
                 } else if (errorCode === 'auth/user-not-found') {
                     setErrors((prevErrors) => ({
                         ...prevErrors,
-                        email: 'This email is not registered',
+                        email: 'This email is not registered. Please sign up first.',
                     }))
                 } else if (errorCode === 'auth/wrong-password') {
                     setErrors((prevErrors) => ({
@@ -194,8 +208,15 @@ const SignIn = () => {
                         'flex w-full justify-center rounded-lg border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium  text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:bg-indigo-700'
                     }
                 >
-                    {isLoading ? 'Logging in...' : 'Log in'}
+                    {isLoading ? 'Signing In...' : 'Sign In'}
                 </button>
+                <hr className="mt-6" />
+                <p className="py-2 text-center text-sm">
+                    Don't have an Account?{' '}
+                    <Link to={'/signup'} className="font-medium">
+                        Sign Up Now
+                    </Link>
+                </p>
             </form>
         </div>
     )
