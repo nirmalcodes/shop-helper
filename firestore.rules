@@ -32,9 +32,31 @@ service cloud.firestore {
       return isSignedIn() && getUserRole() == "user";
     }
 
+    //match /accessGrantedUsers/{userId} {
+    //  allow read;
+    //  allow write, update, delete: if isRoot() || isAdmin();
+    //}
+    
+    //match /users/{userId} {
+    //  allow read, write, delete: if isRoot() || isAdmin();
+    //  allow update: if isRoot();
+    //}
+
+    // Public read access for accessGrantedUsers
+    match /accessGrantedUsers/{userId} {
+      allow read;
+      // Signed-in users with root or admin role can write/update/delete
+      allow write, update, delete: if isSignedIn() && (isRoot() || isAdmin());
+    }
+
+    // Restrict users collection access
     match /users/{userId} {
-      allow read, write, delete: if isRoot() || isAdmin();
-      allow update: if isRoot();
+      // Only signed-in users can create documents
+      allow create: if isSignedIn();
+      // Document name must match user ID
+      allow create: if request.auth.uid == resource.id;
+      // Users can only access their own document
+      allow read, write, delete: if isSignedIn() && request.auth.uid == resource.id;
     }
 
     match /kokoConfigurations/configData {
