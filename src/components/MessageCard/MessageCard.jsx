@@ -39,7 +39,7 @@ const MessageCard = ({
                     setUsername(docSnap.data().username)
                 }
             } catch (error) {
-                // console.error('Error fetching username:', error)
+                console.error('Error fetching username:', error)
             }
         }
 
@@ -182,7 +182,7 @@ const MessageCard = ({
                                     </Menu>
                                 </div>
                             </div>
-                            <p className="message">{message ?? '-'}</p>
+                            <p className="message mr-6">{message ?? '-'}</p>
                             <span className="date-time ml-6 block text-right text-xs">
                                 {formatDateTime(timestamp) ?? '-'}
                             </span>
