@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react'
 import { AuthContext } from '../../contexts/AuthContext'
-import { Navigate, useLocation } from 'react-router-dom'
+import { Link, Navigate, useLocation } from 'react-router-dom'
 import { FaEye, FaEyeSlash } from 'react-icons/fa6'
 import {
     collection,
@@ -13,10 +13,13 @@ import {
     where,
 } from '@firebase/firestore'
 import { auth, firestore } from '../../services/firebase/firebase'
-import { createUserWithEmailAndPassword } from '@firebase/auth'
+import {
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+} from '@firebase/auth'
 
 const SignUp = () => {
-    const { user, emailSignUp } = useContext(AuthContext)
+    const { user } = useContext(AuthContext)
     const location = useLocation()
 
     if (user && location.pathname !== '/') {
@@ -59,6 +62,7 @@ const SignUp = () => {
         return passwordRegex.test(password)
     }
 
+    const accessGrantedUsers = collection(firestore, 'accessGrantedUsers')
     const usersCollectionRef = collection(firestore, 'users')
 
     const handleSignUp = async (e) => {
@@ -82,12 +86,14 @@ const SignUp = () => {
             validationErrors.password =
                 'Password must be at least 8 characters, including at least one uppercase letter, one lowercase letter, one number, and one special character'
         }
-        if (formData.role === 'choose') {
-            validationErrors.role = 'Please choose a role'
-        }
+
+        // const rolesQuery = query(
+        //     usersCollectionRef,
+        //     where('email', '==', formData.email)
+        // )
 
         const rolesQuery = query(
-            usersCollectionRef,
+            accessGrantedUsers,
             where('email', '==', formData.email)
         )
         const rolesSnapshot = await getDocs(rolesQuery)
@@ -102,8 +108,13 @@ const SignUp = () => {
             setIsLoading(false)
         } else {
             try {
+                // const rolesQuery = query(
+                //     usersCollectionRef,
+                //     where('email', '==', formData.email)
+                // )
+
                 const rolesQuery = query(
-                    usersCollectionRef,
+                    accessGrantedUsers,
                     where('email', '==', formData.email)
                 )
                 const rolesSnapshot = await getDocs(rolesQuery)
@@ -123,24 +134,42 @@ const SignUp = () => {
                         formData.email,
                         formData.password
                     )
-                    let registeredId = userCredential.user.uid
+                    // let registeredId = userCredential.user.uid
+                    let registeredUser = userCredential.user
 
-                    const docRef = doc(usersCollectionRef, registeredId)
-                    await setDoc(docRef, {
+                    const userData = {
                         username: formData.username,
-                        email: formData.email,
-                        role: docData.role,
-                        createdBy: docData.createdBy,
-                        createdAt: docData.createdAt,
-                        registeredAt: serverTimestamp(),
-                        restricted: false,
-                    })
+                        firstTimeUser: true,
+                    }
 
-                    const oldDocRef = doc(usersCollectionRef, docData.id)
-                    await deleteDoc(oldDocRef)
+                    const stringifiedUserData = JSON.stringify(userData)
+
+                    localStorage.setItem('tempUserData', stringifiedUserData)
+
+                    await signInWithEmailAndPassword(
+                        auth,
+                        formData.email,
+                        formData.password
+                    )
+
+                    // const docRef = doc(usersCollectionRef, registeredId)
+
+                    // await setDoc(docRef, {
+                    //     username: formData.username,
+                    //     email: formData.email,
+                    //     role: docData.role,
+                    //     createdBy: docData.createdBy,
+                    //     createdAt: docData.createdAt,
+                    //     registeredAt: serverTimestamp(),
+                    //     restricted: false,
+                    // })
+
+                    // const oldDocRef = doc(usersCollectionRef, docData.id)
+                    // await deleteDoc(oldDocRef)
                 }
 
                 setFormData({})
+                setIsLoading(false)
             } catch (error) {
                 const errorCode = error.code
 
@@ -155,8 +184,8 @@ const SignUp = () => {
                         common: 'An error occurred. Please try again later',
                     }))
                 }
+                setIsLoading(false)
             }
-            setIsLoading(false)
         }
     }
 
@@ -276,6 +305,13 @@ const SignUp = () => {
                 >
                     {isLoading ? 'Signing Up...' : 'Sign Up'}
                 </button>
+                <hr className="mt-6" />
+                <p className="py-2 text-center text-sm">
+                    Already have an Account?{' '}
+                    <Link to={'/signin'} className="font-medium">
+                        Sign In Now
+                    </Link>
+                </p>
             </form>
         </div>
     )
