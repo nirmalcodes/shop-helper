@@ -6,15 +6,76 @@ import { firestore } from '../../services/firebase/firebase'
 import {
     collection,
     doc,
+    getDocs,
     limit,
     onSnapshot,
     orderBy,
     query,
+    serverTimestamp,
+    setDoc,
+    where,
 } from '@firebase/firestore'
 import { formatDateTime } from '../../utils/helpers/formatters/formatDateTime'
 
 const Home = () => {
-    const { user, logOut } = useContext(AuthContext)
+    const { user } = useContext(AuthContext)
+
+    const [localUsername, setLocalUsername] = useState(
+        localStorage.getItem('tempUserData')
+            ? JSON.parse(localStorage.getItem('tempUserData')).username
+            : ''
+    )
+    const [isFirstTimeUser, setIsFirstTimeUser] = useState(
+        localStorage.getItem('tempUserData')
+            ? JSON.parse(localStorage.getItem('tempUserData')).firstTimeUser
+            : false
+    )
+
+    const createUserDoc = async (e) => {
+        const currentUID = user.uid
+
+        const accessGrantedUsers = collection(firestore, 'accessGrantedUsers')
+        const usersCollectionRef = collection(firestore, 'users')
+
+        const rolesQuery = query(
+            accessGrantedUsers,
+            where('email', '==', user.email)
+        )
+        const rolesSnapshot = await getDocs(rolesQuery)
+
+        if (!rolesSnapshot.empty) {
+            let docData
+            rolesSnapshot.forEach((doc) => {
+                docData = {
+                    id: doc.id,
+                    ...doc.data(),
+                }
+                return docData
+            })
+
+            const docRef = doc(usersCollectionRef, currentUID)
+
+            await setDoc(docRef, {
+                username: localUsername,
+                email: user.email,
+                role: docData.role,
+                createdBy: docData.createdBy,
+                createdAt: serverTimestamp(),
+                restricted: docData.restricted,
+            })
+
+            localStorage.removeItem('tempUserData')
+        }
+
+        window.location.reload()
+    }
+
+    useEffect(() => {
+        if (isFirstTimeUser) {
+            createUserDoc()
+        }
+    }, [isFirstTimeUser])
+
     const [statCard, setStatCard] = useState({
         name: 'KOKO Calc Mode',
         value: '-',
@@ -79,9 +140,9 @@ const Home = () => {
                                             <p className="text-lg">
                                                 {update?.message}
                                             </p>
-                                            {/* <span className="inline-block text-xs text-slate-400">
+                                            <span className="inline-block text-xs text-slate-400">
                                                 {formatDateTime(timestamp)}
-                                            </span> */}
+                                            </span>
                                         </div>
                                     )
                                 })
