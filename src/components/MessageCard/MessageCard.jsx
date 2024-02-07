@@ -150,7 +150,7 @@ const MessageCard = ({
                             }`}
                         >
                             <div className="flex">
-                                <div className="name text-sm font-medium">
+                                <div className="name text-[13px] font-medium">
                                     {username ?? '-'}
                                 </div>
                                 {own && (
@@ -204,8 +204,10 @@ const MessageCard = ({
                                     </div>
                                 )}
                             </div>
-                            <p className="message mr-6">{message ?? '-'}</p>
-                            <span className="date-time ml-6 block text-right text-xs">
+                            <p className="message mr-6 text-[15px]">
+                                {message ?? '-'}
+                            </p>
+                            <span className="date-time ml-6 block text-right text-[10px]">
                                 {formatDateTime(timestamp) ?? '-'}
                             </span>
                         </div>
@@ -219,7 +221,7 @@ const MessageCard = ({
                         >
                             {message.trim().length === 0 && (
                                 <div className="flex px-1">
-                                    <div className="name pb-[2px] text-sm font-medium">
+                                    <div className="name pb-[2px] text-[13px] font-medium">
                                         {username ?? '-'}
                                     </div>
                                     {own && (
@@ -291,7 +293,7 @@ const MessageCard = ({
                                 ))}
                             </div>
                             {message.trim().length === 0 && (
-                                <span className="date-time ml-6 block pt-[2px] text-right text-xs">
+                                <span className="date-time ml-6 block pt-[2px] text-right text-[10px]">
                                     {formatDateTime(timestamp) ?? '-'}
                                 </span>
                             )}
