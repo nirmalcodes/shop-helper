@@ -17,10 +17,14 @@ const Navbar = ({ toggleOpen }) => {
     }
 
     const fetchUsername = async (userId) => {
-        const userDocRef = doc(firestore, 'users', userId)
-        const docSnap = await getDoc(userDocRef)
-        if (docSnap.exists()) {
-            setDocData({ ...docSnap.data() })
+        try {
+            const userDocRef = doc(firestore, 'users', userId)
+            const docSnap = await getDoc(userDocRef)
+            if (docSnap.exists()) {
+                setDocData({ ...docSnap.data() })
+            }
+        } catch (error) {
+            // console.log(error)
         }
     }
     useEffect(() => {
