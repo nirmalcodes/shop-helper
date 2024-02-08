@@ -30,9 +30,9 @@ const SliderModal = ({ open, onClose, activeSlide, files = [] }) => {
                                 {files.map((file, index) => (
                                     <SplideSlide key={`slide-${index}`}>
                                         <img
-                                            src={file}
-                                            data-splide-lazy={file}
-                                            alt={`Image ${index}`}
+                                            src={file?.url}
+                                            data-splide-lazy={file?.url}
+                                            alt={file?.name}
                                             loading="lazy"
                                             className="h-full w-full object-contain"
                                         />
