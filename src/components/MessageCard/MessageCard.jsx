@@ -6,7 +6,6 @@ import {
     collection,
     deleteDoc,
     doc,
-    getDoc,
     getDocs,
     query,
     where,
@@ -17,6 +16,7 @@ import { formatDateTime } from '../../utils/helpers/formatters/formatDateTime'
 import { FaEllipsisVertical, FaRegTrashCan } from 'react-icons/fa6'
 import DeleteModal from '../Modals/DeleteModal/DeleteModal'
 import { Menu, Transition } from '@headlessui/react'
+import SliderModal from '../Modals/SliderModal/SliderModal'
 
 const MessageCard = ({
     createdBy,
@@ -134,6 +134,18 @@ const MessageCard = ({
         setIsDltOpen(false)
     }
 
+    const [isSliderOpen, setIsSliderOpen] = useState(false)
+    const [activeSlideNo, setActiveSlideNo] = useState(null)
+
+    const openSlider = (number) => {
+        setActiveSlideNo(number)
+        setIsSliderOpen(true)
+    }
+    const closeSlider = () => {
+        setActiveSlideNo(null)
+        setIsSliderOpen(false)
+    }
+
     return (
         <>
             {/* row */}
@@ -214,90 +226,102 @@ const MessageCard = ({
                     )}
                     {/* attachments */}
                     {attachments.length > 0 && (
-                        <div
-                            className={`mssg-attachment-card${
-                                own ? ' bg-green-200' : ' bg-white'
-                            }`}
-                        >
-                            {message.trim().length === 0 && (
-                                <div className="flex px-1">
-                                    <div className="name pb-[2px] text-[13px] font-medium">
-                                        {username ?? '-'}
-                                    </div>
-                                    {own && (
-                                        <div className="ml-auto leading-none">
-                                            {/* dropdown */}
-                                            <Menu
-                                                as="div"
-                                                className="relative inline-block text-left"
-                                            >
-                                                <div>
-                                                    <Menu.Button className="inline-flex justify-center text-sm focus:outline-none focus-visible:ring-0 focus-visible:ring-transparent">
-                                                        <FaEllipsisVertical />
-                                                    </Menu.Button>
-                                                </div>
-                                                <Transition
-                                                    as={Fragment}
-                                                    enter="transition ease-out duration-100"
-                                                    enterFrom="transform opacity-0 scale-95"
-                                                    enterTo="transform opacity-100 scale-100"
-                                                    leave="transition ease-in duration-75"
-                                                    leaveFrom="transform opacity-100 scale-100"
-                                                    leaveTo="transform opacity-0 scale-95"
-                                                >
-                                                    <Menu.Items className="absolute right-0 mt-2 w-52 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none">
-                                                        <div className="px-1 py-1">
-                                                            <Menu.Item>
-                                                                {({
-                                                                    active,
-                                                                }) => (
-                                                                    <button
-                                                                        className={`font-medium ${
-                                                                            active
-                                                                                ? ' bg-black/5 text-gray-900'
-                                                                                : ' text-gray-900'
-                                                                        } group flex w-full items-center rounded-md px-2 py-2`}
-                                                                        onClick={(
-                                                                            e
-                                                                        ) => {
-                                                                            openDltModal(
-                                                                                messageId
-                                                                            )
-                                                                        }}
-                                                                    >
-                                                                        <FaRegTrashCan className="mr-1" />
-                                                                        Delete
-                                                                    </button>
-                                                                )}
-                                                            </Menu.Item>
-                                                        </div>
-                                                    </Menu.Items>
-                                                </Transition>
-                                            </Menu>
+                        <>
+                            <div
+                                className={`mssg-attachment-card${
+                                    own ? ' bg-green-200' : ' bg-white'
+                                }`}
+                            >
+                                {message.trim().length === 0 && (
+                                    <div className="flex px-1">
+                                        <div className="name pb-[2px] text-[13px] font-medium">
+                                            {username ?? '-'}
                                         </div>
-                                    )}
-                                </div>
-                            )}
-                            <div className="attachment-wrapper">
-                                {attachments.map((attachment, index) => (
-                                    <div
-                                        className="attachment-thumbnail"
-                                        key={`img-${index + 1}`}
-                                    >
-                                        <img
-                                            src={attachment}
-                                            alt="img"
-                                            loading="lazy"
-                                        />
+                                        {own && (
+                                            <div className="ml-auto leading-none">
+                                                {/* dropdown */}
+                                                <Menu
+                                                    as="div"
+                                                    className="relative inline-block text-left"
+                                                >
+                                                    <div>
+                                                        <Menu.Button className="inline-flex justify-center text-sm focus:outline-none focus-visible:ring-0 focus-visible:ring-transparent">
+                                                            <FaEllipsisVertical />
+                                                        </Menu.Button>
+                                                    </div>
+                                                    <Transition
+                                                        as={Fragment}
+                                                        enter="transition ease-out duration-100"
+                                                        enterFrom="transform opacity-0 scale-95"
+                                                        enterTo="transform opacity-100 scale-100"
+                                                        leave="transition ease-in duration-75"
+                                                        leaveFrom="transform opacity-100 scale-100"
+                                                        leaveTo="transform opacity-0 scale-95"
+                                                    >
+                                                        <Menu.Items className="absolute right-0 mt-2 w-52 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none">
+                                                            <div className="px-1 py-1">
+                                                                <Menu.Item>
+                                                                    {({
+                                                                        active,
+                                                                    }) => (
+                                                                        <button
+                                                                            className={`font-medium ${
+                                                                                active
+                                                                                    ? ' bg-black/5 text-gray-900'
+                                                                                    : ' text-gray-900'
+                                                                            } group flex w-full items-center rounded-md px-2 py-2`}
+                                                                            onClick={(
+                                                                                e
+                                                                            ) => {
+                                                                                openDltModal(
+                                                                                    messageId
+                                                                                )
+                                                                            }}
+                                                                        >
+                                                                            <FaRegTrashCan className="mr-1" />
+                                                                            Delete
+                                                                        </button>
+                                                                    )}
+                                                                </Menu.Item>
+                                                            </div>
+                                                        </Menu.Items>
+                                                    </Transition>
+                                                </Menu>
+                                            </div>
+                                        )}
                                     </div>
-                                ))}
+                                )}
+                                <div className="attachment-wrapper">
+                                    {attachments.map((attachment, index) => (
+                                        <div
+                                            className="attachment-thumbnail"
+                                            key={`img-${index}`}
+                                            onClick={() => {
+                                                openSlider(index)
+                                            }}
+                                        >
+                                            <img
+                                                src={attachment}
+                                                alt="img"
+                                                loading="lazy"
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                                {message.trim().length === 0 && (
+                                    <span className="date-time ml-6 block pt-[2px] text-right text-[10px]">
+                                        {formatDateTime(timestamp) ?? '-'}
+                                    </span>
+                                )}
                             </div>
-                            {message.trim().length === 0 && (
-                                <span className="date-time ml-6 block pt-[2px] text-right text-[10px]">
-                                    {formatDateTime(timestamp) ?? '-'}
-                                </span>
+                            {isSliderOpen && (
+                                <SliderModal
+                                    activeSlide={activeSlideNo}
+                                    onClose={closeSlider}
+                                    files={attachments}
+                                />
                             )}
-                        </div>
+                        </>
                     )}
                 </div>
             </div>
