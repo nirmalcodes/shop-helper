@@ -1,10 +1,11 @@
 import React, { useContext } from 'react'
-import { FaRegHandshake } from 'react-icons/fa6'
 import { NavLink } from 'react-router-dom'
 import { RoutesContext } from '../../../contexts/RoutesContext'
+import { AuthContext } from '../../../contexts/AuthContext'
 
 const Sidebar = ({ open = true, toggleOpen }) => {
     const { routes } = useContext(RoutesContext)
+    const { user } = useContext(AuthContext)
 
     const toggleSidebar = () => {
         toggleOpen(false)
@@ -13,7 +14,7 @@ const Sidebar = ({ open = true, toggleOpen }) => {
     return (
         <>
             <aside className={`sidebar ${open && 'open'}`}>
-                <div className="flex h-14 flex-shrink-0 items-center justify-center gap-x-3 border-b text-4xl p-2">
+                <div className="flex h-14 flex-shrink-0 items-center justify-center gap-x-3 border-b p-2 text-4xl">
                     <img
                         src="/shop-helper-logo.png"
                         alt="Shop Helper"
