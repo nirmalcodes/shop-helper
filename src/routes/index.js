@@ -1,7 +1,7 @@
 import { lazy } from 'react'
 import {
     FaHouse,
-    FaEnvelopeOpenText,
+    FaComments,
     FaCalculator,
     FaGear,
 } from 'react-icons/fa6'
@@ -11,12 +11,11 @@ const SignUp = lazy(() => import('../pages/SignUp/SignUp'))
 
 const Home = lazy(() => import('../pages/Home/Home'))
 const KOKO = lazy(() => import('../pages/KOKO/KOKO'))
-const Updates = lazy(() => import('../pages/Updates/Updates'))
+const Chat = lazy(() => import('../pages/Chat/Chat'))
 
 const Settings = lazy(() => import('../pages/Settings/Settings'))
 const KOKOSettings = lazy(() => import('../pages/KOKOSettings/KOKOSettings'))
 const UserSettings = lazy(() => import('../pages/UserSettings/UserSettings'))
-const UpdatesSettings = lazy(() => import('../pages/UpdatesSettings/UpdatesSettings'))
 
 const ROUTES = [
     {
@@ -65,12 +64,12 @@ const ROUTES = [
     },
     {
         id: 5,
-        name: 'Updates',
-        icon: FaEnvelopeOpenText,
+        name: 'Chat',
+        icon: FaComments,
         protected: true,
-        path: '/updates',
+        path: '/chat',
         main: true,
-        component: Updates,
+        component: Chat,
         hiddenInSidebar: false,
         children: [],
     },
@@ -101,16 +100,6 @@ const ROUTES = [
                 path: '/koko_settings',
                 main: false,
                 component: KOKOSettings,
-                hiddenInSidebar: true,
-                children: [],
-            },
-            {
-                id: 3,
-                name: 'Updates Settings',
-                icon: false,
-                path: '/updates_settings',
-                main: false,
-                component: UpdatesSettings,
                 hiddenInSidebar: true,
                 children: [],
             },
