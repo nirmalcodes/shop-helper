@@ -81,15 +81,15 @@ const Home = () => {
         value: '-',
         icon: FaCalculator,
     })
-    const [updates, setUpdates] = useState([])
+    const [messages, setMessages] = useState([])
 
     const kokoConfigurationsRef = doc(
         firestore,
         'kokoConfigurations',
         'configData'
     )
-    const updatesRef = collection(firestore, 'messages')
-    const q = query(updatesRef, orderBy('createdAt', 'desc'), limit(5))
+    const messagesRef = collection(firestore, 'messages')
+    const q = query(messagesRef, orderBy('createdAt', 'desc'), limit(5))
 
     useEffect(() => {
         const unsubKokoConfig = onSnapshot(kokoConfigurationsRef, (doc) => {
@@ -100,21 +100,19 @@ const Home = () => {
             }))
         })
 
-        const unsubUpdates = onSnapshot(q, (snapshot) => {
-            const updatesData = snapshot.docs.map((doc) => ({
+        const unsubMessages = onSnapshot(q, (snapshot) => {
+            const messagesData = snapshot.docs.map((doc) => ({
                 id: doc.id,
                 ...doc.data(),
             }))
-            setUpdates(updatesData)
+            setMessages(messagesData)
         })
 
         return () => {
             unsubKokoConfig()
-            unsubUpdates()
+            unsubMessages()
         }
     }, [])
-
-    // console.log(updates)
 
     return (
         <>
@@ -122,15 +120,15 @@ const Home = () => {
                 <div className="mb-5 flex flex-row flex-wrap items-center">
                     <StatCard data={statCard} />
                 </div>
-                <div className="mb-5 flex flex-row flex-wrap items-center">
+                {/* <div className="mb-5 flex flex-row flex-wrap items-center">
                     <div className="w-full rounded-lg bg-white p-4 shadow-md">
                         <h3 className="mb-2 text-xl font-bold text-indigo-600">
-                            Recent Updates
+                            Recent messages
                         </h3>
                         <hr className="border-t-2" />
                         <div className="flex flex-col divide-y">
-                            {updates && updates.length > 0 ? (
-                                updates.map((update) => {
+                            {messages && messages.length > 0 ? (
+                                messages.map((update) => {
                                     let timestamp = update?.createdAt?.seconds
                                     return (
                                         <div
@@ -148,12 +146,12 @@ const Home = () => {
                                 })
                             ) : (
                                 <div className="grid min-h-[100px] place-items-center font-medium text-slate-500/50">
-                                    No Updates to show
+                                    No messages to show
                                 </div>
                             )}
                         </div>
                     </div>
-                </div>
+                </div> */}
             </section>
         </>
     )
