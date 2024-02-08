@@ -37,6 +37,9 @@ const MessageCard = ({
 
     const [documentId, setDocumentId] = useState(null)
 
+    const [isSliderOpen, setIsSliderOpen] = useState(false)
+    const [activeSlideNo, setActiveSlideNo] = useState(null)
+
     useEffect(() => {
         const fetchUsername = async () => {
             try {
@@ -134,9 +137,6 @@ const MessageCard = ({
         setIsDltOpen(false)
     }
 
-    const [isSliderOpen, setIsSliderOpen] = useState(false)
-    const [activeSlideNo, setActiveSlideNo] = useState(null)
-
     const openSlider = (number) => {
         setActiveSlideNo(number)
         setIsSliderOpen(true)
@@ -158,7 +158,7 @@ const MessageCard = ({
                             className={`mssg-txt-card${
                                 own
                                     ? ' ml-auto rounded-tr-none bg-green-200'
-                                    : ' rounded-tl-none bg-white'
+                                    : ' mr-auto rounded-tl-none bg-white'
                             }`}
                         >
                             <div className="flex">
@@ -229,7 +229,9 @@ const MessageCard = ({
                         <>
                             <div
                                 className={`mssg-attachment-card${
-                                    own ? ' bg-green-200' : ' bg-white'
+                                    own
+                                        ? ' ml-auto bg-green-200'
+                                        : ' mr-auto bg-white'
                                 }`}
                             >
                                 {message.trim().length === 0 && (
@@ -301,8 +303,8 @@ const MessageCard = ({
                                             }}
                                         >
                                             <img
-                                                src={attachment}
-                                                alt="img"
+                                                src={attachment?.url}
+                                                alt={attachment?.name}
                                                 loading="lazy"
                                             />
                                         </div>
