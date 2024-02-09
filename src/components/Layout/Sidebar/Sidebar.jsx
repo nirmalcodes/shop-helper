@@ -1,15 +1,39 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { RoutesContext } from '../../../contexts/RoutesContext'
 import { AuthContext } from '../../../contexts/AuthContext'
+import { firestore } from '../../../services/firebase/firebase'
+import { doc, getDoc } from '@firebase/firestore'
 
 const Sidebar = ({ open = true, toggleOpen }) => {
     const { routes } = useContext(RoutesContext)
     const { user } = useContext(AuthContext)
 
+    const [userRole, setUserRole] = useState(null)
+
     const toggleSidebar = () => {
         toggleOpen(false)
     }
+
+    useEffect(() => {
+        const getUserRole = async () => {
+            try {
+                const currentUser = user.uid
+                const docRef = doc(firestore, 'users', currentUser)
+                const docSnap = await getDoc(docRef)
+
+                if (docSnap.exists()) {
+                    const role = docSnap.data().role
+                    setUserRole(role)
+                }
+            } catch (error) {
+                // console.log(error)
+            }
+        }
+
+        getUserRole()
+        return () => {}
+    }, [])
 
     return (
         <>
@@ -33,6 +57,28 @@ const Sidebar = ({ open = true, toggleOpen }) => {
                         {routes.map((route) => {
                             if (route?.hiddenInSidebar) {
                                 return null
+                            } else if (route?.path == '/settings') {
+                                if (userRole == 'root' || userRole == 'admin') {
+                                    return (
+                                        <li
+                                            key={route?.id}
+                                            onClick={toggleSidebar}
+                                        >
+                                            <NavLink
+                                                to={route?.path}
+                                                className={'sidebar-link'}
+                                            >
+                                                {route?.icon && <route.icon />}
+
+                                                <span className="text-[0.8125rem] font-medium leading-none">
+                                                    {route?.name}
+                                                </span>
+                                            </NavLink>
+                                        </li>
+                                    )
+                                } else {
+                                    return null
+                                }
                             } else {
                                 return (
                                     <li key={route?.id} onClick={toggleSidebar}>
