@@ -1,12 +1,47 @@
-import React, { Suspense } from 'react'
+import React, { Suspense, useEffect, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import { RoutesProvider } from './contexts/RoutesContext'
 import { ProtectedRoute } from './components'
 import ROUTES from './routes'
+import { firestore } from './services/firebase/firebase'
+import { doc, getDoc } from '@firebase/firestore'
 
 const App = () => {
+    const [user, setUser] = useState(
+        localStorage.getItem('user')
+            ? JSON.parse(localStorage.getItem('user'))
+            : null
+    )
+
+    const [userRole, setUserRole] = useState(
+        localStorage.getItem('userRole')
+            ? JSON.parse(localStorage.getItem('userRole'))
+            : null
+    )
+
+    useEffect(() => {
+        const getUserRole = async () => {
+            try {
+                const currentUser = user.uid
+                const docRef = doc(firestore, 'users', currentUser)
+                const docSnap = await getDoc(docRef)
+
+                if (docSnap.exists()) {
+                    const role = docSnap.data().role
+                    localStorage.setItem('userRole', JSON.stringify(role))
+                    setUserRole(role)
+                }
+            } catch (error) {
+                // console.log(error)
+            }
+        }
+
+        getUserRole()
+        return () => {}
+    }, [])
+
     return (
         <>
             <Suspense>
@@ -15,88 +50,64 @@ const App = () => {
                         <RoutesProvider>
                             <Routes>
                                 {ROUTES.map((route) => {
-                                    let mainRoutes = []
-                                    let childRoutes = []
-
-                                    // main routes mapping
-                                    // main protected routes mapping
-                                    if (route?.main && route?.protected) {
-                                        mainRoutes = [
-                                            <Route
-                                                key={route?.id}
-                                                path={route?.path}
-                                                element={
+                                    const routeComponent = (child) => (
+                                        <Route
+                                            key={child.id}
+                                            path={route.path + child.path}
+                                            element={
+                                                route.protected ? (
                                                     <ProtectedRoute>
-                                                        <route.component />
-                                                    </ProtectedRoute>
-                                                }
-                                            />,
-                                        ]
-                                    }
-                                    // main unprotected routes mapping
-                                    if (
-                                        route?.main &&
-                                        route?.protected === false
-                                    ) {
-                                        mainRoutes = [
-                                            <Route
-                                                key={route?.id}
-                                                path={route?.path}
-                                                element={<route.component />}
-                                            />,
-                                        ]
-                                    }
-
-                                    // child routes mapping
-                                    // child protected routes mapping
-                                    if (
-                                        route?.children.length > 0 &&
-                                        route?.protected
-                                    ) {
-                                        childRoutes = route?.children.map(
-                                            (child) => (
-                                                <Route
-                                                    key={child?.id}
-                                                    path={
-                                                        route?.path +
-                                                        child?.path
-                                                    }
-                                                    element={
-                                                        <ProtectedRoute>
+                                                        {child.component && (
                                                             <child.component />
-                                                        </ProtectedRoute>
-                                                    }
-                                                />
-                                            )
-                                        )
-                                    }
-
-                                    // child unprotected routes mapping
-                                    if (
-                                        route?.children.length > 0 &&
-                                        route?.protected === false
-                                    ) {
-                                        childRoutes = route?.children.map(
-                                            (child) => (
-                                                <Route
-                                                    key={child?.id}
-                                                    path={
-                                                        route?.path +
-                                                        child?.path
-                                                    }
-                                                    element={
+                                                        )}
+                                                    </ProtectedRoute>
+                                                ) : (
+                                                    child.component && (
                                                         <child.component />
-                                                    }
-                                                />
-                                            )
-                                        )
-                                    }
+                                                    )
+                                                )
+                                            }
+                                        />
+                                    )
 
-                                    return [...mainRoutes, ...childRoutes]
+                                    const shouldRenderRoute =
+                                        userRole === 'root' ||
+                                        userRole === 'admin' ||
+                                        !(
+                                            userRole === 'user' &&
+                                            route.path.startsWith('/settings')
+                                        )
+
+                                    return shouldRenderRoute
+                                        ? [
+                                              route.main && (
+                                                  <Route
+                                                      key={route.id}
+                                                      path={route.path}
+                                                      element={
+                                                          route.protected ? (
+                                                              <ProtectedRoute>
+                                                                  {route.component && (
+                                                                      <route.component />
+                                                                  )}
+                                                              </ProtectedRoute>
+                                                          ) : (
+                                                              route.component && (
+                                                                  <route.component />
+                                                              )
+                                                          )
+                                                      }
+                                                  />
+                                              ),
+                                              ...route.children.map(
+                                                  routeComponent
+                                              ),
+                                          ]
+                                        : null
                                 })}
 
                                 <Route
-                                    path={'*'}
+                                    path="*"
                                     element={<div>404 Page Not Found</div>}
                                 />
                             </Routes>
