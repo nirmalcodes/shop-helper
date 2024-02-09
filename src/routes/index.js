@@ -90,7 +90,7 @@ const ROUTES = [
                 path: '/user_settings',
                 main: false,
                 component: UserSettings,
-                hiddenInSidAebar: true,
+                hiddenInSidebar: true,
                 children: [],
             },
             {
