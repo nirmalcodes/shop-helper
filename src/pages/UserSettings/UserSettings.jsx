@@ -1,6 +1,6 @@
 import React, { Fragment, lazy, useContext, useEffect, useState } from 'react'
 import { Breadcrumbs } from '../../components'
-import { FaTrashCan, FaPen } from 'react-icons/fa6'
+import { FaTrashCan, FaPen, FaLockOpen } from 'react-icons/fa6'
 import { Dialog, Transition } from '@headlessui/react'
 import { data } from '../../utils/constants'
 import { AuthContext } from '../../contexts/AuthContext'
@@ -18,6 +18,7 @@ import {
     where,
 } from '@firebase/firestore'
 import { firestore, auth } from '../../services/firebase/firebase'
+import { sendPasswordResetEmail } from '@firebase/auth'
 
 const DeleteModal = lazy(
     () => import('../../components/Modals/DeleteModal/DeleteModal')
@@ -25,6 +26,61 @@ const DeleteModal = lazy(
 const EditModal = lazy(
     () => import('../../components/Modals/EditModal/EditModal')
 )
+
+export const ResetBtn = ({ email }) => {
+    const [isButtonDisabled, setIsButtonDisabled] = useState(false)
+    const [countdown, setCountdown] = useState(60)
+
+    const handlePasswordReset = async (e) => {
+        e.preventDefault()
+        try {
+            await sendPasswordResetEmail(auth, email)
+            // console.log('Password reset email sent!')
+
+            setIsButtonDisabled(true)
+            setCountdown(60)
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    useEffect(() => {
+        let interval
+
+        if (isButtonDisabled) {
+            interval = setInterval(() => {
+                setCountdown((prevCountdown) => prevCountdown - 1)
+            }, 1000)
+        }
+
+        return () => {
+            clearInterval(interval)
+        }
+    }, [isButtonDisabled])
+
+    useEffect(() => {
+        // Enable the button after 60 seconds
+        if (countdown === 0) {
+            setIsButtonDisabled(false)
+        }
+    }, [countdown])
+
+    return (
+        <button
+            type="button"
+            title="Password reset"
+            className="rounded bg-sky-200/50 p-2 text-sky-600 transition-all duration-100 ease-in hover:bg-sky-200 disabled:bg-gray-200 disabled:text-gray-600"
+            disabled={isButtonDisabled}
+            onClick={handlePasswordReset}
+        >
+            {isButtonDisabled ? (
+                <p className="text-xs font-medium">{`${countdown}s`}</p>
+            ) : (
+                <FaLockOpen />
+            )}
+        </button>
+    )
+}
 
 const UserSettings = () => {
     const { user } = useContext(AuthContext)
@@ -264,29 +320,32 @@ const UserSettings = () => {
                                             {currentUserEmail !==
                                                 user.email && (
                                                 <div className="flex justify-center gap-x-2">
+                                                    <ResetBtn
+                                                        email={user.email}
+                                                    />
                                                     <button
                                                         type="button"
                                                         title="Edit"
-                                                        className="rounded bg-green-200/50 p-2 transition-all duration-100 ease-in hover:bg-green-200"
+                                                        className="rounded bg-green-200/50 p-2 text-green-600 transition-all duration-100 ease-in hover:bg-green-200 disabled:bg-gray-200 disabled:text-gray-600"
                                                         onClick={(e) => {
                                                             openEditModal(
                                                                 user.id
                                                             )
                                                         }}
                                                     >
-                                                        <FaPen className="text-green-600" />
+                                                        <FaPen />
                                                     </button>
                                                     <button
                                                         type="button"
                                                         title="Delete"
-                                                        className="rounded bg-red-200/50 p-2 transition-all duration-100 ease-in hover:bg-red-200"
+                                                        className="rounded bg-red-200/50 p-2 text-red-600 transition-all duration-100 ease-in hover:bg-red-200 disabled:bg-gray-200 disabled:text-gray-600"
                                                         onClick={(e) => {
                                                             openDltModal(
                                                                 user.id
                                                             )
                                                         }}
                                                     >
-                                                        <FaTrashCan className="text-red-600" />
+                                                        <FaTrashCan />
                                                     </button>
                                                 </div>
                                             )}
