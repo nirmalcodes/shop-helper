@@ -19,6 +19,7 @@ import imageCompression from 'browser-image-compression'
 import {
     collection,
     doc,
+    getDoc,
     onSnapshot,
     orderBy,
     query,
@@ -27,15 +28,13 @@ import {
 } from '@firebase/firestore'
 import { getDownloadURL, ref, uploadBytes } from '@firebase/storage'
 
-export const PreviewTumbnails = ({ data = [] }) => {
-    return <></>
-}
-
 const Chat = () => {
     const { user } = useContext(AuthContext)
 
     const msgContRef = useRef(null)
     const fileInputRef = useRef(null)
+
+    const [userRole, setUserRole] = useState(null)
 
     const [isHeightDone, setIsHeightDone] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
@@ -62,6 +61,26 @@ const Chat = () => {
             setIsHeightDone(true)
         }
 
+        return () => {}
+    }, [])
+
+    useEffect(() => {
+        const getUserRole = async () => {
+            try {
+                const currentUser = user.uid
+                const docRef = doc(firestore, 'users', currentUser)
+                const docSnap = await getDoc(docRef)
+
+                if (docSnap.exists()) {
+                    const role = docSnap.data().role
+                    setUserRole(role)
+                }
+            } catch (error) {
+                // console.log(error)
+            }
+        }
+
+        getUserRole()
         return () => {}
     }, [])
 
@@ -188,121 +207,155 @@ const Chat = () => {
         }
     }, [])
 
-    console.log(images)
-
     return (
         <>
-            <div
-                className="relative mb-[64px] flex flex-[1_1_0] flex-col gap-4 overflow-hidden overflow-y-auto bg-gradient-to-br from-sky-200 via-sky-100 to-sky-50 px-4 py-3"
-                ref={msgContRef}
-            >
-                {isHeightDone &&
-                    (messages.length > 0 ? (
-                        messages.map((message) => (
-                            <MessageCard
-                                key={message?.id}
-                                messageId={message?.id}
-                                createdBy={message?.createdBy}
-                                message={message?.message}
-                                attachments={message?.attachments}
-                                timestamp={message?.createdAt?.seconds}
-                            />
-                        ))
-                    ) : (
-                        <div className="flex flex-1 flex-col items-center justify-center text-gray-400">
-                            <FaRegComments className="text-7xl" />
-                            <p className="text-lg">
-                                Looks like messages are empty.
-                            </p>
-                        </div>
-                    ))}
-            </div>
-            {/* inputs */}
-            <div className="absolute inset-x-0 bottom-0 z-50 border-t bg-white">
-                {/* previews */}
-                {!imgUploaded && images.length > 0 && (
-                    <div className="flex flex-wrap gap-1 border-b bg-red-300/0 px-3 py-2">
-                        {images.map((image, index) => (
-                            <div
-                                className="relative aspect-square h-[100px] max-w-[100dvh] overflow-hidden rounded md:h-[120px] xl:h-[150px]"
-                                key={index}
-                            >
-                                <button
-                                    type="button"
-                                    className="absolute inset-0 flex items-center justify-center bg-black/15 text-3xl text-white transition-colors duration-150 ease-in hover:bg-black/25"
-                                    onClick={() => handleImageRemove(index)}
-                                    disabled={isLoading}
+            {userRole == 'root' || userRole == 'admin' ? (
+                <>
+                    <div
+                        className="relative mb-[64px] flex flex-[1_1_0] flex-col gap-4 overflow-hidden overflow-y-auto bg-gradient-to-br from-sky-200 via-sky-100 to-sky-50 px-4 py-3"
+                        ref={msgContRef}
+                    >
+                        {isHeightDone &&
+                            (messages.length > 0 ? (
+                                messages.map((message) => (
+                                    <MessageCard
+                                        key={message?.id}
+                                        messageId={message?.id}
+                                        createdBy={message?.createdBy}
+                                        message={message?.message}
+                                        attachments={message?.attachments}
+                                        timestamp={message?.createdAt?.seconds}
+                                    />
+                                ))
+                            ) : (
+                                <div className="flex flex-1 flex-col items-center justify-center text-gray-400">
+                                    <FaRegComments className="text-7xl" />
+                                    <p className="text-lg">
+                                        Looks like messages are empty.
+                                    </p>
+                                </div>
+                            ))}
+                    </div>
+                    {/* inputs */}
+                    <div className="absolute inset-x-0 bottom-0 z-50 border-t bg-white">
+                        {/* previews */}
+                        {!imgUploaded && images.length > 0 && (
+                            <div className="flex flex-wrap gap-1 border-b bg-red-300/0 px-3 py-2">
+                                {images.map((image, index) => (
+                                    <div
+                                        className="relative aspect-square h-[100px] max-w-[100dvh] overflow-hidden rounded md:h-[120px] xl:h-[150px]"
+                                        key={index}
+                                    >
+                                        <button
+                                            type="button"
+                                            className="absolute inset-0 flex items-center justify-center bg-black/15 text-3xl text-white transition-colors duration-150 ease-in hover:bg-black/25"
+                                            onClick={() =>
+                                                handleImageRemove(index)
+                                            }
+                                            disabled={isLoading}
+                                        >
+                                            {isLoading ? (
+                                                <div className="animate-bounce">
+                                                    <FaCloudArrowUp className="animate-pulse" />
+                                                </div>
+                                            ) : (
+                                                <FaRegTrashCan />
+                                            )}
+                                        </button>
+                                        <img
+                                            src={URL.createObjectURL(image)}
+                                            alt={image.name}
+                                            loading="lazy"
+                                            className="h-full w-full bg-gradient-to-tr from-gray-500 to-gray-100 object-cover object-left-top"
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        {errorMessage && (
+                            <span className="px-3 text-sm text-red-600">
+                                {errorMessage}
+                            </span>
+                        )}
+
+                        {/* form */}
+                        <form
+                            onSubmit={handleSubmit}
+                            className="flex min-h-[64px] w-full flex-1 items-end px-2 py-3 md:px-4"
+                        >
+                            {/* attachment input */}
+                            <div>
+                                <label
+                                    htmlFor="attachFiles"
+                                    className={`flex h-[36px] w-[36px] flex-shrink-0 cursor-pointer items-center justify-center rounded-full p-2 hover:bg-slate-400/10 md:h-[40px] md:w-[40px]`}
                                 >
-                                    {isLoading ? (
-                                        <div className="animate-bounce">
-                                            <FaCloudArrowUp className="animate-pulse" />
-                                        </div>
-                                    ) : (
-                                        <FaRegTrashCan />
-                                    )}
-                                </button>
-                                <img
-                                    src={URL.createObjectURL(image)}
-                                    alt={image.name}
-                                    loading="lazy"
-                                    className="h-full w-full bg-gradient-to-tr from-gray-500 to-gray-100 object-cover object-left-top"
+                                    <FaCamera className="text-xl md:text-2xl" />
+                                </label>
+                                <input
+                                    type="file"
+                                    id="attachFiles"
+                                    ref={fileInputRef}
+                                    multiple
+                                    onChange={handleImageChange}
+                                    accept="image/*"
+                                    className="hidden"
                                 />
                             </div>
-                        ))}
+                            {/* text input */}
+                            <div className="mx-[6px] flex flex-1 items-end md:mx-3">
+                                <AutoResizeTextarea
+                                    id="message"
+                                    placeholder="Message"
+                                    value={message}
+                                    onChange={handleMessageChange}
+                                />
+                            </div>
+                            {/* send btn */}
+                            <div>
+                                <button
+                                    type="submit"
+                                    disabled={
+                                        message === '' &&
+                                        images.length === 0 &&
+                                        true
+                                    }
+                                    className="flex h-[36px] w-[36px] flex-shrink-0 cursor-pointer items-center justify-center rounded-full p-2 hover:bg-slate-400/10 disabled:cursor-not-allowed disabled:text-slate-400 disabled:hover:bg-transparent md:h-[40px] md:w-[40px]"
+                                >
+                                    <FaPaperPlane className="text-xl md:text-2xl" />
+                                </button>
+                            </div>
+                        </form>
                     </div>
-                )}
-                {errorMessage && (
-                    <span className="px-3 text-sm text-red-600">
-                        {errorMessage}
-                    </span>
-                )}
-
-                {/* form */}
-                <form
-                    onSubmit={handleSubmit}
-                    className="flex min-h-[64px] w-full flex-1 items-end px-2 py-3 md:px-4"
-                >
-                    {/* attachment input */}
-                    <div>
-                        <label
-                            htmlFor="attachFiles"
-                            className={`flex h-[36px] w-[36px] flex-shrink-0 cursor-pointer items-center justify-center rounded-full p-2 hover:bg-slate-400/10 md:h-[40px] md:w-[40px]`}
-                        >
-                            <FaCamera className="text-xl md:text-2xl" />
-                        </label>
-                        <input
-                            type="file"
-                            id="attachFiles"
-                            ref={fileInputRef}
-                            multiple
-                            onChange={handleImageChange}
-                            accept="image/*"
-                            className="hidden"
-                        />
+                </>
+            ) : (
+                <>
+                    <div
+                        className="relative flex flex-[1_1_0] flex-col gap-4 overflow-hidden overflow-y-auto bg-gradient-to-br from-sky-200 via-sky-100 to-sky-50 px-4 py-3"
+                        ref={msgContRef}
+                    >
+                        {isHeightDone &&
+                            (messages.length > 0 ? (
+                                messages.map((message) => (
+                                    <MessageCard
+                                        key={message?.id}
+                                        messageId={message?.id}
+                                        createdBy={message?.createdBy}
+                                        message={message?.message}
+                                        attachments={message?.attachments}
+                                        timestamp={message?.createdAt?.seconds}
+                                    />
+                                ))
+                            ) : (
+                                <div className="flex flex-1 flex-col items-center justify-center text-gray-400">
+                                    <FaRegComments className="text-7xl" />
+                                    <p className="text-lg">
+                                        Looks like messages are empty.
+                                    </p>
+                                </div>
+                            ))}
                     </div>
-                    {/* text input */}
-                    <div className="mx-[6px] flex flex-1 items-end md:mx-3">
-                        <AutoResizeTextarea
-                            id="message"
-                            placeholder="Message"
-                            value={message}
-                            onChange={handleMessageChange}
-                        />
-                    </div>
-                    {/* send btn */}
-                    <div>
-                        <button
-                            type="submit"
-                            disabled={
-                                message === '' && images.length === 0 && true
-                            }
-                            className="flex h-[36px] w-[36px] flex-shrink-0 cursor-pointer items-center justify-center rounded-full p-2 hover:bg-slate-400/10 disabled:cursor-not-allowed disabled:text-slate-400 disabled:hover:bg-transparent md:h-[40px] md:w-[40px]"
-                        >
-                            <FaPaperPlane className="text-xl md:text-2xl" />
-                        </button>
-                    </div>
-                </form>
-            </div>
+                </>
+            )}
         </>
     )
 }
