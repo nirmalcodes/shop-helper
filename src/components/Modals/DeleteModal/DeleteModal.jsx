@@ -58,7 +58,7 @@ const DeleteModal = ({
                                                 Cancel
                                             </button>
                                             <button
-                                                type="submit"
+                                                type="button"
                                                 className="flex w-full justify-center rounded-lg border border-transparent  bg-red-500 px-4 py-2 text-sm font-medium text-white   shadow-sm transition-all  duration-100 ease-in hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 disabled:bg-red-700"
                                                 onClick={onConfirm}
                                             >
