@@ -121,7 +121,15 @@ const EditModal = ({ isOpen, onClose, email }) => {
 
     return (
         <Transition appear show={isOpen} as={Fragment}>
-            <Dialog as="div" className="relative z-[9999]" onClose={onClose}>
+            <Dialog
+                as="div"
+                className="relative z-[9999]"
+                onClose={() => {
+                    setFormData({})
+                    setErrors({})
+                    onClose()
+                }}
+            >
                 <Transition.Child
                     as={Fragment}
                     enter="ease-out duration-300"
@@ -216,7 +224,11 @@ const EditModal = ({ isOpen, onClose, email }) => {
                                             <button
                                                 type="button"
                                                 className="flex w-full flex-1 justify-center rounded-lg border border-red-500 px-4 py-2 text-sm font-medium text-red-500 shadow-sm transition-all duration-100  ease-in hover:bg-red-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 disabled:opacity-50"
-                                                onClick={onClose}
+                                                onClick={() => {
+                                                    setFormData({})
+                                                    setErrors({})
+                                                    onClose()
+                                                }}
                                             >
                                                 Cancel
                                             </button>
