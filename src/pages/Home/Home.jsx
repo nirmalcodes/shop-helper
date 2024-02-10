@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { AuthContext } from '../../contexts/AuthContext'
-import { FaCalculator } from 'react-icons/fa6'
+import { FaCalculator, FaUser } from 'react-icons/fa6'
 import { StatCard } from '../../components'
 import { firestore } from '../../services/firebase/firebase'
 import {
@@ -76,11 +76,17 @@ const Home = () => {
         }
     }, [isFirstTimeUser])
 
-    const [statCard, setStatCard] = useState({
+    const [kokoStatCard, setKokoStatCard] = useState({
         name: 'KOKO Calc Mode',
         value: '-',
         icon: FaCalculator,
     })
+    const [usersStatCard, setUsersStatCard] = useState({
+        name: 'Users Count',
+        value: '-',
+        icon: FaUser,
+    })
+
     const [messages, setMessages] = useState([])
 
     const kokoConfigurationsRef = doc(
@@ -92,9 +98,23 @@ const Home = () => {
     const q = query(messagesRef, orderBy('createdAt', 'desc'), limit(5))
 
     useEffect(() => {
+        const getUserCount = async () => {
+            const accessGrantedUsers = collection(
+                firestore,
+                'accessGrantedUsers'
+            )
+            const currentUsers = await getDocs(accessGrantedUsers)
+            const count = currentUsers.size
+            // currentUsersCount = count
+            setUsersStatCard((prevData) => ({
+                ...prevData,
+                value: count - 1,
+            }))
+        }
+
         const unsubKokoConfig = onSnapshot(kokoConfigurationsRef, (doc) => {
             const { discountMode } = doc.data()
-            setStatCard((prevData) => ({
+            setKokoStatCard((prevData) => ({
                 ...prevData,
                 value: discountMode ? 'Discount' : 'Default',
             }))
@@ -108,6 +128,7 @@ const Home = () => {
             setMessages(messagesData)
         })
 
+        getUserCount()
         return () => {
             unsubKokoConfig()
             unsubMessages()
@@ -117,8 +138,9 @@ const Home = () => {
     return (
         <>
             <section className="container px-4 py-5">
-                <div className="mb-5 flex flex-row flex-wrap items-center">
-                    <StatCard data={statCard} />
+                <div className="mb-5 flex flex-row flex-wrap items-center gap-4">
+                    <StatCard data={kokoStatCard} />
+                    <StatCard data={usersStatCard} />
                 </div>
                 {/* <div className="mb-5 flex flex-row flex-wrap items-center">
                     <div className="w-full rounded-lg bg-white p-4 shadow-md">
