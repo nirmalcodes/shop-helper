@@ -9,12 +9,12 @@ import {
     collection,
     deleteDoc,
     doc,
+    getDoc,
     getDocs,
     onSnapshot,
     orderBy,
     query,
     serverTimestamp,
-    updateDoc,
     where,
 } from '@firebase/firestore'
 import { firestore, auth } from '../../services/firebase/firebase'
@@ -107,6 +107,8 @@ const UserSettings = () => {
         setIsAddOpen(true)
     }
     const closeAddModal = () => {
+        setFormData({})
+        setErrors({})
         setIsAddOpen(false)
     }
 
@@ -147,12 +149,6 @@ const UserSettings = () => {
 
     const accessGrantedUsers = collection(firestore, 'accessGrantedUsers')
 
-    const filteredQ = query(
-        accessGrantedUsers,
-        where('restricted', '==', false),
-        orderBy('email')
-    )
-
     const handleAddUser = async (e) => {
         e.preventDefault()
         setIsLoading(true)
@@ -168,14 +164,45 @@ const UserSettings = () => {
             validationErrors.role = 'Please choose a role'
         }
 
-        const rolesQuery = query(
-            accessGrantedUsers,
-            where('email', '==', formData.email)
-        )
-        const rolesSnapshot = await getDocs(rolesQuery)
+        try {
+            let maxUsersLimit = 0
+            let currentUsersCount = 0
 
-        if (!rolesSnapshot.empty) {
-            validationErrors.email = 'This email is already in use'
+            //get allowed max users count from site config doc
+            const siteConfigs = doc(
+                firestore,
+                'siteConfigurations',
+                'configData'
+            )
+            const docSnap = await getDoc(siteConfigs)
+
+            if (docSnap.exists()) {
+                maxUsersLimit = docSnap.data().maxUsers
+            }
+
+            console.log('max users: ', maxUsersLimit)
+
+            // get how many users currently in the system
+            const currentUsers = await getDocs(accessGrantedUsers)
+            const count = currentUsers.size
+            currentUsersCount = count
+            console.log('Number of documents:', currentUsersCount)
+
+            if (currentUsersCount > maxUsersLimit) {
+                validationErrors.email = 'Max users count reached!'
+            }
+
+            const rolesQuery = query(
+                accessGrantedUsers,
+                where('email', '==', formData.email)
+            )
+            const rolesSnapshot = await getDocs(rolesQuery)
+
+            if (!rolesSnapshot.empty) {
+                validationErrors.email = 'This email is already in use'
+            }
+        } catch (error) {
+            console.error(error)
         }
 
         if (Object.keys(validationErrors).length > 0) {
@@ -206,22 +233,6 @@ const UserSettings = () => {
         }
     }
 
-    // const handleEditUser = async (e) => {
-    //     e.preventDefault()
-    //     setIsLoading(true)
-
-    //     const docRef = doc(firestore, 'accessGrantedUsers', documentId)
-
-    //     try {
-    //         await updateDoc(docRef, { role: formData.role })
-    //         setDocumentId(null)
-    //         setIsEditOpen(false)
-    //     } catch (error) {
-    //         console.error('Error editing document: ', error)
-    //     }
-    //     setIsLoading(false)
-    // }
-
     const handleDltUser = async (e) => {
         e.preventDefault()
         // console.log(`Deleting user with ID: ${documentId}`)
@@ -241,6 +252,11 @@ const UserSettings = () => {
         setIsDltOpen(false)
     }
 
+    const filteredQ = query(
+        accessGrantedUsers,
+        where('restricted', '==', false),
+        orderBy('email')
+    )
     useEffect(() => {
         const unsubscribe = onSnapshot(filteredQ, (snapshot) => {
             const usersData = snapshot.docs.map((doc) => ({
