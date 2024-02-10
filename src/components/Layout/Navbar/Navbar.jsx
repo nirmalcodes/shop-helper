@@ -1,10 +1,5 @@
 import React, { Fragment, useContext, useEffect, useState } from 'react'
-import {
-    FaBars,
-    FaArrowRightFromBracket,
-    FaCircleUser,
-    FaUser,
-} from 'react-icons/fa6'
+import { FaBars, FaArrowRightFromBracket, FaUser } from 'react-icons/fa6'
 import { AuthContext } from '../../../contexts/AuthContext'
 import { firestore } from '../../../services/firebase/firebase'
 import { doc, getDoc } from '@firebase/firestore'
@@ -26,8 +21,6 @@ const Navbar = ({ toggleOpen }) => {
     const getFirstLetter = (word) => {
         if (typeof word === 'string' && word.length > 0) {
             return word[0].toUpperCase()
-        } else {
-            return 'Please enter a valid word'
         }
     }
 
@@ -111,7 +104,7 @@ const Navbar = ({ toggleOpen }) => {
                                                     onClick={handleLogOut}
                                                 >
                                                     <FaArrowRightFromBracket className="mr-1" />
-                                                    Sign Out
+                                                    Sign out
                                                 </button>
                                             )}
                                         </Menu.Item>
