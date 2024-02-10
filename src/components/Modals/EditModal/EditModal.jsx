@@ -1,10 +1,17 @@
 import React, { Fragment, useEffect, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { data } from '../../../utils/constants'
-import { doc, getDoc, updateDoc } from '@firebase/firestore'
+import {
+    collection,
+    doc,
+    getDocs,
+    query,
+    updateDoc,
+    where,
+} from '@firebase/firestore'
 import { firestore } from '../../../services/firebase/firebase'
 
-const EditModal = ({ isOpen, onClose, onSave, editId }) => {
+const EditModal = ({ isOpen, onClose, email }) => {
     const [isLoading, setIsLoading] = useState(false)
     const [formData, setFormData] = useState({
         email: '',
@@ -27,28 +34,47 @@ const EditModal = ({ isOpen, onClose, onSave, editId }) => {
         })
     }
 
+    const [userDocIDs, setuserDocIDs] = useState([])
+
     useEffect(() => {
-        const getDocData = async () => {
+        const findUserDocs = async () => {
             try {
-                const docRef = doc(firestore, 'users', editId)
-                const docSnap = await getDoc(docRef)
-                if (docSnap.exists()) {
-                    const docData = docSnap.data()
+                const aGUsers = collection(firestore, 'accessGrantedUsers')
+                const usersRef = collection(firestore, 'users')
+
+                const queryAGUs = query(aGUsers, where('email', '==', email))
+                const queryUs = query(usersRef, where('email', '==', email))
+
+                const aGUsSnapshot = await getDocs(queryAGUs)
+                const usersSnapshot = await getDocs(queryUs)
+
+                let userIDArray = []
+
+                aGUsSnapshot.forEach((doc) => {
+                    userIDArray.push(doc.id)
+                    const docData = doc.data()
+
                     setFormData({
-                        email: docData.email,
-                        role: docData.role,
+                        email: docData?.email,
+                        role: docData?.role,
                     })
-                } else {
-                    console.log('No such document!')
-                }
+                })
+
+                usersSnapshot.forEach((doc) => {
+                    userIDArray.push(doc.id)
+                })
+
+                setuserDocIDs([...userDocIDs, ...userIDArray])
             } catch (error) {
-                // console.log(error)
+                console.error(error)
             }
         }
 
-        getDocData()
+        findUserDocs()
         return () => {}
-    }, [editId])
+    }, [email])
+
+    // console.log(userDocIDs)
 
     const isValidEmail = (email) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -75,10 +101,16 @@ const EditModal = ({ isOpen, onClose, onSave, editId }) => {
             setIsLoading(false)
         } else {
             try {
-                const docRef = doc(firestore, 'users', editId)
-                console.log('new role ', formData.role)
-                await updateDoc(docRef, { role: formData.role })
-                console.log('Document successfully edited!')
+                const aGUsRef = doc(
+                    firestore,
+                    'accessGrantedUsers',
+                    userDocIDs[0]
+                )
+                const usersRef = doc(firestore, 'users', userDocIDs[1])
+                // console.log('new role ', formData.role)
+                await updateDoc(aGUsRef, { role: formData.role })
+                await updateDoc(usersRef, { role: formData.role })
+                // console.log('Document successfully edited!')
             } catch (error) {
                 console.error('Error editing document: ', error)
             }
