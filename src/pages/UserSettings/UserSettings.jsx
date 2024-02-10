@@ -329,7 +329,7 @@ const UserSettings = () => {
                                                         className="rounded bg-green-200/50 p-2 text-green-600 transition-all duration-100 ease-in hover:bg-green-200 disabled:bg-gray-200 disabled:text-gray-600"
                                                         onClick={(e) => {
                                                             openEditModal(
-                                                                user.id
+                                                                user.email
                                                             )
                                                         }}
                                                     >
@@ -505,7 +505,7 @@ const UserSettings = () => {
                     isOpen={isEditOpen}
                     onClose={closeEditModal}
                     onConfirm={handleEditUser}
-                    editId={documentId}
+                    email={documentId}
                 />
                 <DeleteModal
                     isOpen={isDltOpen}
