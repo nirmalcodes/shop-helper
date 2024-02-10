@@ -206,25 +206,21 @@ const UserSettings = () => {
         }
     }
 
-    const handleEditUser = async (e) => {
-        e.preventDefault()
-        // console.log(`Editing user with ID: ${documentId}`)
-        setIsLoading(true)
+    // const handleEditUser = async (e) => {
+    //     e.preventDefault()
+    //     setIsLoading(true)
 
-        // const docRef = doc(firestore, 'users', documentId)
-        const docRef = doc(firestore, 'accessGrantedUsers', documentId)
+    //     const docRef = doc(firestore, 'accessGrantedUsers', documentId)
 
-        try {
-            // console.log('new role ', formData.role)
-            await updateDoc(docRef, { role: formData.role })
-            setDocumentId(null)
-            // console.log('Document successfully edited!')
-            setIsEditOpen(false)
-        } catch (error) {
-            console.error('Error editing document: ', error)
-        }
-        setIsLoading(false)
-    }
+    //     try {
+    //         await updateDoc(docRef, { role: formData.role })
+    //         setDocumentId(null)
+    //         setIsEditOpen(false)
+    //     } catch (error) {
+    //         console.error('Error editing document: ', error)
+    //     }
+    //     setIsLoading(false)
+    // }
 
     const handleDltUser = async (e) => {
         e.preventDefault()
@@ -504,7 +500,7 @@ const UserSettings = () => {
                 <EditModal
                     isOpen={isEditOpen}
                     onClose={closeEditModal}
-                    onConfirm={handleEditUser}
+                    // onConfirm={handleEditUser}
                     email={documentId}
                 />
                 <DeleteModal
