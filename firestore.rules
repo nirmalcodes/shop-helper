@@ -32,30 +32,17 @@ service cloud.firestore {
       return isSignedIn() && getUserRole() == "user";
     }
 
-    //match /accessGrantedUsers/{userId} {
-    //  allow read;
-    //  allow write, update, delete: if isRoot() || isAdmin();
-    //}
     
-    //match /users/{userId} {
-    //  allow read, write, delete: if isRoot() || isAdmin();
-    //  allow update: if isRoot();
-    //}
-
-    // Public read access for accessGrantedUsers
     match /accessGrantedUsers/{userId} {
       allow read;
-      // Signed-in users with root or admin role can write/update/delete
       allow write, update, delete: if isSignedIn() && (isRoot() || isAdmin());
     }
 
-    // Restrict users collection access
+    
     match /users/{userId} {
-      // Only signed-in users can create documents
       allow create, read: if isSignedIn();
-      // Document name must match user ID
-      allow create: if request.auth.uid == resource.id;
-      // Users can only access their own document
+      allow create: if request.auth.uid == resource.id; 
+      allow write: if (isRoot() || isAdmin());
       allow read, write, delete: if isSignedIn() && request.auth.uid == resource.id;
     }
 
@@ -63,11 +50,6 @@ service cloud.firestore {
       allow read, write: if isRoot() || isAdmin();
       allow read: if isUser();
     }
-
-    //match /messages/{document=**} {
-    //  allow read, write: if isRoot() || isAdmin();
-    //  allow read: if isUser();
-    //}
     
     match /messages/{document=**} {
       allow read: if isUser();
