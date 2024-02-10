@@ -180,13 +180,13 @@ const UserSettings = () => {
                 maxUsersLimit = docSnap.data().maxUsers
             }
 
-            console.log('max users: ', maxUsersLimit)
+            // console.log('max users: ', maxUsersLimit)
 
             // get how many users currently in the system
             const currentUsers = await getDocs(accessGrantedUsers)
             const count = currentUsers.size
             currentUsersCount = count
-            console.log('Number of documents:', currentUsersCount)
+            // console.log('user count with new user:', currentUsersCount)
 
             if (currentUsersCount > maxUsersLimit) {
                 validationErrors.email = 'Max users count reached!'
