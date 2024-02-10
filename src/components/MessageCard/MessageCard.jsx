@@ -29,6 +29,7 @@ const MessageCard = ({
 
     const messageRef = useRef(null)
 
+    const [userRole, setUserRole] = useState(null)
     const [isLoading, setIsLoading] = useState(false)
     const [isDltOpen, setIsDltOpen] = useState(false)
 
@@ -43,9 +44,9 @@ const MessageCard = ({
     useEffect(() => {
         const fetchUsername = async () => {
             try {
-                const usersCollectionRef = collection(firestore, 'users')
+                const usersRef = collection(firestore, 'users')
                 const rolesQuery = query(
-                    usersCollectionRef,
+                    usersRef,
                     where('email', '==', createdBy)
                 )
                 const rolesSnapshot = await getDocs(rolesQuery)
@@ -60,6 +61,7 @@ const MessageCard = ({
                         return docData
                     })
                     setUsername(docData.username)
+                    setUserRole(docData.role)
                 }
             } catch (error) {
                 console.error('Error fetching username:', error)
@@ -73,6 +75,7 @@ const MessageCard = ({
         fetchUsername()
 
         messageRef.current?.scrollIntoView({ behavior: 'smooth' })
+        return () => {}
     }, [])
 
     const openDltModal = (id) => {
@@ -165,7 +168,7 @@ const MessageCard = ({
                                 <div className="name text-[13px] font-medium">
                                     {username ?? '-'}
                                 </div>
-                                {own && (
+                                {own && userRole != 'user' && (
                                     <div className="ml-auto leading-none">
                                         {/* dropdown */}
                                         <Menu
@@ -239,7 +242,7 @@ const MessageCard = ({
                                         <div className="name pb-[2px] text-[13px] font-medium">
                                             {username ?? '-'}
                                         </div>
-                                        {own && (
+                                        {own && userRole != 'user' && (
                                             <div className="ml-auto leading-none">
                                                 {/* dropdown */}
                                                 <Menu
