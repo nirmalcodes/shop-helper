@@ -7,6 +7,7 @@ import { ProtectedRoute } from './components'
 import ROUTES from './routes'
 import { firestore } from './services/firebase/firebase'
 import { doc, getDoc, onSnapshot } from '@firebase/firestore'
+import Loader from './components/Loader/Loader'
 
 const SiteDisabled = lazy(() => import('./pages/SiteDisabled/SiteDisabled'))
 
@@ -58,7 +59,7 @@ const App = () => {
 
     return (
         <>
-            <Suspense>
+            <Suspense fallback={<Loader />}>
                 <ErrorBoundary fallback={<div>Something went wrong...</div>}>
                     {isSiteActive ? (
                         <AuthProvider>
