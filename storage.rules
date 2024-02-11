@@ -1,24 +1,15 @@
 rules_version = '2';
-
-// Import functions from Firestore rules
-import './firestore.rules';
-
 service firebase.storage {
   match /b/{bucket}/o {
 
-    // Allow only signed-in users to access Storage
     match /{allPaths=**} {
-      allow read, write: if request.auth != null;
-    }
-
-    // Messages folder access control based on user role
-    match /messages/{allPaths=**} {
-      
-      // Read access for all signed-in users
       allow read: if request.auth != null;
-
-      // Granular access based on user role
-      allow write, delete: if isRoot() || isAdmin();
     }
+
+    match /messages/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write, delete: if equest.auth != null && firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role in;
+    }
+
   }
 }
