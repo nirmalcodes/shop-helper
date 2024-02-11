@@ -100,7 +100,7 @@ const Home = () => {
 
     useEffect(() => {
         const getUserCount = async () => {
-            let maxUsersLimit = 0
+            let maxUsersLimit
 
             const siteConfigs = doc(
                 firestore,
