@@ -4,12 +4,8 @@ import { Link, Navigate, useLocation } from 'react-router-dom'
 import { FaEye, FaEyeSlash } from 'react-icons/fa6'
 import {
     collection,
-    deleteDoc,
-    doc,
     getDocs,
     query,
-    serverTimestamp,
-    setDoc,
     where,
 } from '@firebase/firestore'
 import { auth, firestore } from '../../services/firebase/firebase'
