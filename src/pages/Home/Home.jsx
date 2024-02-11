@@ -6,6 +6,7 @@ import { firestore } from '../../services/firebase/firebase'
 import {
     collection,
     doc,
+    getDoc,
     getDocs,
     limit,
     onSnapshot,
@@ -99,16 +100,31 @@ const Home = () => {
 
     useEffect(() => {
         const getUserCount = async () => {
+            let maxUsersLimit = 0
+
+            const siteConfigs = doc(
+                firestore,
+                'siteConfigurations',
+                'configData'
+            )
+            const docSnap = await getDoc(siteConfigs)
+
+            if (docSnap.exists()) {
+                maxUsersLimit = docSnap.data().maxUsers
+            }
+
             const accessGrantedUsers = collection(
                 firestore,
                 'accessGrantedUsers'
             )
             const currentUsers = await getDocs(accessGrantedUsers)
             const count = currentUsers.size
+
+            const userCount = `${count - 1} / ${maxUsersLimit - 1}`
             // currentUsersCount = count
             setUsersStatCard((prevData) => ({
                 ...prevData,
-                value: count - 1,
+                value: userCount,
             }))
         }
 
