@@ -3,22 +3,13 @@ import React from 'react'
 const SiteDisabled = () => {
     return (
         <>
-            <main
-                className="flex min-h-[100dvh] items-center justify-center"
-                style={{
-                    backgroundImage: `url(/background_shapes.jpg)`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    backgroundRepeat: 'no-repeat',
-                    filter: 'grayscale(100%)',
-                }}
-            >
+            <main className="flex min-h-[100dvh] items-center justify-center">
                 <section className="container flex flex-row flex-wrap-reverse items-center gap-8 p-4">
                     <div className="md:flex-1">
-                        <h1 className="mb-2 pr-20 text-2xl font-semibold text-white md:text-[34px] lg:mb-5 lg:text-[48px]">
+                        <h1 className="mb-2 pr-20 text-2xl font-semibold text-slate-800 md:text-[34px] lg:mb-5 lg:text-[48px]">
                             This Site Temporarily Inactive
                         </h1>
-                        <p className="pr-10 text-white lg:pr-[320px] lg:text-lg">
+                        <p className="pr-10 text-gray-500 lg:pr-[320px] lg:text-lg">
                             Uh-oh! It seems like our site is currently inactive.
                             This may be due to a temporary disruption in
                             service. If you are experiencing issues or have
