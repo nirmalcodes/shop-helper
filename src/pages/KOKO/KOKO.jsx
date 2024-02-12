@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { NumberInput } from '../../components'
-import { images } from '../../utils/constants'
 import { FaTag } from 'react-icons/fa6'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { firestore } from '../../services/firebase/firebase'
 import { doc, onSnapshot } from '@firebase/firestore'
+import { Helmet } from 'react-helmet-async'
 
 const KOKO = () => {
     const [convenienceRate, setConvenienceRate] = useState(0)
@@ -277,6 +277,9 @@ const KOKO = () => {
 
     return (
         <>
+            <Helmet>
+                <title>Shop Helper | KOKO</title>
+            </Helmet>
             <ToastContainer
                 position="top-center"
                 autoClose={2000}

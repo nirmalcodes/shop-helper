@@ -16,7 +16,7 @@ import {
     setDoc,
     where,
 } from '@firebase/firestore'
-import { formatDateTime } from '../../utils/helpers/formatters/formatDateTime'
+import { Helmet } from 'react-helmet-async'
 
 const Home = () => {
     const { user } = useContext(AuthContext)
@@ -153,6 +153,9 @@ const Home = () => {
 
     return (
         <>
+            <Helmet>
+                <title>Shop Helper | Home</title>
+            </Helmet>
             <section className="container px-4 py-5">
                 <div className="mb-5 flex flex-row flex-wrap items-center gap-4">
                     <StatCard data={kokoStatCard} />

@@ -1,8 +1,12 @@
 import React from 'react'
+import { Helmet } from 'react-helmet-async'
 
 const SiteDisabled = () => {
     return (
         <>
+            <Helmet>
+                <title>Site Temporarily Inactive</title>
+            </Helmet>
             <main className="flex min-h-[100dvh] items-center justify-center">
                 <section className="container flex flex-row flex-wrap-reverse items-center gap-8 p-4">
                     <div className="md:flex-1">

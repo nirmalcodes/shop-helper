@@ -1,4 +1,4 @@
-import React, { Fragment, Suspense, lazy, useEffect, useState } from 'react'
+import React, { Suspense, lazy, useEffect, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
@@ -8,6 +8,7 @@ import ROUTES from './routes'
 import { firestore } from './services/firebase/firebase'
 import { doc, getDoc, onSnapshot } from '@firebase/firestore'
 import Loader from './components/Loader/Loader'
+import { HelmetProvider } from 'react-helmet-async'
 
 const SiteDisabled = lazy(() => import('./pages/SiteDisabled/SiteDisabled'))
 
@@ -59,89 +60,97 @@ const App = () => {
 
     return (
         <>
-            <Suspense fallback={<Loader />}>
-                <ErrorBoundary fallback={<div>Something went wrong...</div>}>
-                    {isSiteActive ? (
-                        <AuthProvider>
-                            <RoutesProvider>
-                                <Routes>
-                                    {ROUTES.map((route) => {
-                                        const routeComponent = (child) => (
-                                            <Route
-                                                key={child.id}
-                                                path={route.path + child.path}
-                                                element={
-                                                    route.protected ? (
-                                                        <ProtectedRoute>
-                                                            {child.component && (
+            <HelmetProvider>
+                <Suspense fallback={<Loader />}>
+                    <ErrorBoundary
+                        fallback={<div>Something went wrong...</div>}
+                    >
+                        {isSiteActive ? (
+                            <AuthProvider>
+                                <RoutesProvider>
+                                    <Routes>
+                                        {ROUTES.map((route) => {
+                                            const routeComponent = (child) => (
+                                                <Route
+                                                    key={child.id}
+                                                    path={
+                                                        route.path + child.path
+                                                    }
+                                                    element={
+                                                        route.protected ? (
+                                                            <ProtectedRoute>
+                                                                {child.component && (
+                                                                    <child.component />
+                                                                )}
+                                                            </ProtectedRoute>
+                                                        ) : (
+                                                            child.component && (
                                                                 <child.component />
-                                                            )}
-                                                        </ProtectedRoute>
-                                                    ) : (
-                                                        child.component && (
-                                                            <child.component />
+                                                            )
                                                         )
-                                                    )
-                                                }
-                                            />
-                                        )
-
-                                        const shouldRenderRoute =
-                                            userRole === 'root' ||
-                                            userRole === 'admin' ||
-                                            !(
-                                                userRole === 'user' &&
-                                                route.path.startsWith(
-                                                    '/settings'
-                                                )
+                                                    }
+                                                />
                                             )
 
-                                        return shouldRenderRoute
-                                            ? [
-                                                  route.main && (
-                                                      <Route
-                                                          key={route.id}
-                                                          path={route.path}
-                                                          element={
-                                                              route.protected ? (
-                                                                  <ProtectedRoute>
-                                                                      {route.component && (
-                                                                          <route.component />
-                                                                      )}
-                                                                  </ProtectedRoute>
-                                                              ) : (
-                                                                  route.component && (
-                                                                      <route.component />
-                                                                  )
-                                                              )
-                                                          }
-                                                      />
-                                                  ),
-                                                  ...route.children.map(
-                                                      routeComponent
-                                                  ),
-                                              ]
-                                            : null
-                                    })}
+                                            const shouldRenderRoute =
+                                                userRole === 'root' ||
+                                                userRole === 'admin' ||
+                                                !(
+                                                    userRole === 'user' &&
+                                                    route.path.startsWith(
+                                                        '/settings'
+                                                    )
+                                                )
 
-                                    <Route
-                                        path="*"
-                                        element={<div>404 Page Not Found</div>}
-                                    />
-                                </Routes>
-                            </RoutesProvider>
-                        </AuthProvider>
-                    ) : (
-                        <Routes>
-                            <Route
-                                path="*"
-                                element={<Navigate to={'/'} replace />}
-                            />
-                            <Route path="/" element={<SiteDisabled />} />
-                        </Routes>
-                    )}
-                </ErrorBoundary>
-            </Suspense>
+                                            return shouldRenderRoute
+                                                ? [
+                                                      route.main && (
+                                                          <Route
+                                                              key={route.id}
+                                                              path={route.path}
+                                                              element={
+                                                                  route.protected ? (
+                                                                      <ProtectedRoute>
+                                                                          {route.component && (
+                                                                              <route.component />
+                                                                          )}
+                                                                      </ProtectedRoute>
+                                                                  ) : (
+                                                                      route.component && (
+                                                                          <route.component />
+                                                                      )
+                                                                  )
+                                                              }
+                                                          />
+                                                      ),
+                                                      ...route.children.map(
+                                                          routeComponent
+                                                      ),
+                                                  ]
+                                                : null
+                                        })}
+
+                                        <Route
+                                            path="*"
+                                            element={
+                                                <div>404 Page Not Found</div>
+                                            }
+                                        />
+                                    </Routes>
+                                </RoutesProvider>
+                            </AuthProvider>
+                        ) : (
+                            <Routes>
+                                <Route
+                                    path="*"
+                                    element={<Navigate to={'/'} replace />}
+                                />
+                                <Route path="/" element={<SiteDisabled />} />
+                            </Routes>
+                        )}
+                    </ErrorBoundary>
+                </Suspense>
+            </HelmetProvider>
         </>
     )
 }

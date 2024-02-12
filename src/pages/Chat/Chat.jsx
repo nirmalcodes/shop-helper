@@ -27,6 +27,7 @@ import {
     setDoc,
 } from '@firebase/firestore'
 import { getDownloadURL, ref, uploadBytes } from '@firebase/storage'
+import { Helmet } from 'react-helmet-async'
 
 const Chat = () => {
     const { user } = useContext(AuthContext)
@@ -209,6 +210,9 @@ const Chat = () => {
 
     return (
         <>
+            <Helmet>
+                <title>Shop Helper | Chat</title>
+            </Helmet>
             {userRole == 'root' || userRole == 'admin' ? (
                 <>
                     <div
