@@ -84,7 +84,7 @@ export const ResetBtn = ({ email }) => {
 
 export const StatusPill = ({ email }) => {
     const [status, setStatus] = useState({
-        label: '...',
+        label: 'Loading...',
         value: false,
     })
 
