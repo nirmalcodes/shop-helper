@@ -84,7 +84,7 @@ export const ResetBtn = ({ email }) => {
 
 export const StatusPill = ({ email }) => {
     const [status, setStatus] = useState({
-        label: '',
+        label: '...',
         value: false,
     })
 
@@ -103,7 +103,7 @@ export const StatusPill = ({ email }) => {
                 if (!aGUQSnapshot.empty && !usersQSnapshot.empty) {
                     // console.log('active account found')
                     setStatus({
-                        label: 'Avtive',
+                        label: 'Active',
                         value: true,
                     })
                 } else if (!aGUQSnapshot.empty && usersQSnapshot.empty) {
@@ -136,7 +136,7 @@ export const StatusPill = ({ email }) => {
                     : 'bg-gray-200/50 text-gray-500'
             }`}
         >
-            {status.label}
+            {status.label ?? '...'}
         </div>
     )
 }
