@@ -82,6 +82,65 @@ export const ResetBtn = ({ email }) => {
     )
 }
 
+export const StatusPill = ({ email }) => {
+    const [status, setStatus] = useState({
+        label: '',
+        value: false,
+    })
+
+    useEffect(() => {
+        const handleAccStatus = async (mail) => {
+            try {
+                const aGUsersRef = collection(firestore, 'accessGrantedUsers')
+                const usersRef = collection(firestore, 'users')
+
+                const aGUQuery = query(aGUsersRef, where('email', '==', mail))
+                const usersQuery = query(usersRef, where('email', '==', mail))
+
+                const aGUQSnapshot = await getDocs(aGUQuery)
+                const usersQSnapshot = await getDocs(usersQuery)
+
+                if (!aGUQSnapshot.empty && !usersQSnapshot.empty) {
+                    // console.log('active account found')
+                    setStatus({
+                        label: 'Avtive',
+                        value: true,
+                    })
+                } else if (!aGUQSnapshot.empty && usersQSnapshot.empty) {
+                    // console.log('pending activation account found')
+                    setStatus({
+                        label: 'Pending Activation',
+                        value: false,
+                    })
+                } else {
+                    // console.log('no account found')
+                    setStatus({
+                        label: 'Not found',
+                        value: false,
+                    })
+                }
+            } catch (error) {
+                console.error(error)
+            }
+        }
+
+        handleAccStatus(email)
+        return () => {}
+    }, [email])
+
+    return (
+        <div
+            className={`mx-auto w-fit rounded-full px-4 py-2 text-sm font-medium capitalize leading-none ${
+                status.value
+                    ? 'bg-green-200/50 text-green-600'
+                    : 'bg-gray-200/50 text-gray-500'
+            }`}
+        >
+            {status.label}
+        </div>
+    )
+}
+
 const UserSettings = () => {
     const { user } = useContext(AuthContext)
     const [isLoading, setIsLoading] = useState(false)
@@ -257,6 +316,7 @@ const UserSettings = () => {
         where('restricted', '==', false),
         orderBy('email')
     )
+
     useEffect(() => {
         const unsubscribe = onSnapshot(filteredQ, (snapshot) => {
             const usersData = snapshot.docs.map((doc) => ({
@@ -310,6 +370,12 @@ const UserSettings = () => {
                                     scope="col"
                                     className="px-4 py-3 text-center font-semibold text-slate-500"
                                 >
+                                    Account Status
+                                </th>
+                                <th
+                                    scope="col"
+                                    className="px-4 py-3 text-center font-semibold text-slate-500"
+                                >
                                     Actions
                                 </th>
                             </tr>
@@ -327,6 +393,9 @@ const UserSettings = () => {
                                             <p className="capitalize">
                                                 {user.role}
                                             </p>
+                                        </td>
+                                        <td className="px-4 py-3 text-center">
+                                            <StatusPill email={user.email} />
                                         </td>
                                         <td className="px-4 py-3 text-center">
                                             {currentUserEmail !==
@@ -366,7 +435,7 @@ const UserSettings = () => {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={3}>
+                                    <td colSpan={4}>
                                         <div className="grid min-h-[100px] place-items-center font-medium text-slate-500/50">
                                             No user records to show
                                         </div>
