@@ -89,6 +89,7 @@ const Home = () => {
     })
 
     const [messages, setMessages] = useState([])
+    const [userRole, setUserRole] = useState(null)
 
     const kokoConfigurationsRef = doc(
         firestore,
@@ -99,6 +100,20 @@ const Home = () => {
     const q = query(messagesRef, orderBy('createdAt', 'desc'), limit(5))
 
     useEffect(() => {
+        const getUserRole = async () => {
+            try {
+                const currentUser = user.uid
+                const docRef = doc(firestore, 'users', currentUser)
+                const docSnap = await getDoc(docRef)
+
+                if (docSnap.exists()) {
+                    const role = docSnap.data().role
+                    setUserRole(role)
+                }
+            } catch (error) {
+                // console.log(error)
+            }
+        }
         const getUserCount = async () => {
             let maxUsersLimit
 
@@ -144,6 +159,7 @@ const Home = () => {
             setMessages(messagesData)
         })
 
+        getUserRole()
         getUserCount()
         return () => {
             unsubKokoConfig()
@@ -159,7 +175,10 @@ const Home = () => {
             <section className="container px-4 py-5">
                 <div className="mb-5 flex flex-row flex-wrap items-center gap-4">
                     <StatCard data={kokoStatCard} />
-                    <StatCard data={usersStatCard} />
+                    {userRole == 'root' ||
+                        (userRole == 'admin' && (
+                            <StatCard data={usersStatCard} />
+                        ))}
                 </div>
                 {/* <div className="mb-5 flex flex-row flex-wrap items-center">
                     <div className="w-full rounded-lg bg-white p-4 shadow-md">
