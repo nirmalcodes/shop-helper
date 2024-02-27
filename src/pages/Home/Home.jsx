@@ -108,10 +108,11 @@ const Home = () => {
 
                 if (docSnap.exists()) {
                     const role = docSnap.data().role
+                    // console.log(role)
                     setUserRole(role)
                 }
             } catch (error) {
-                // console.log(error)
+                console.log(error)
             }
         }
         const getUserCount = async () => {
@@ -175,10 +176,9 @@ const Home = () => {
             <section className="container px-4 py-5">
                 <div className="mb-5 flex flex-row flex-wrap items-center gap-4">
                     <StatCard data={kokoStatCard} />
-                    {userRole == 'root' ||
-                        (userRole == 'admin' && (
-                            <StatCard data={usersStatCard} />
-                        ))}
+                    {(userRole == 'root' || userRole == 'admin') && (
+                        <StatCard data={usersStatCard} />
+                    )}
                 </div>
                 {/* <div className="mb-5 flex flex-row flex-wrap items-center">
                     <div className="w-full rounded-lg bg-white p-4 shadow-md">
