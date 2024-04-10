@@ -86,9 +86,7 @@ const UpdateCard = ({ update }) => {
                     <Thumbnails dataArray={filesData} />
                 </div>
                 {/* <p className="mb-[2px] text-sm">{message}</p> */}
-                <span className="ml-auto inline-block text-[0.6875rem]">
-                    {formatDateTime(update?.createdAt?.seconds) ?? '-'}
-                </span>
+                  
             </div>
         </div>
     )
