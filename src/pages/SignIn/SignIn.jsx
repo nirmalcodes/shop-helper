@@ -1,141 +1,145 @@
-import React, { useContext, useState } from 'react'
-import { AuthContext } from '../../contexts/AuthContext'
-import { Link, Navigate, useLocation } from 'react-router-dom'
-import { FaEye, FaEyeSlash } from 'react-icons/fa6'
-import { signInWithEmailAndPassword } from '@firebase/auth'
-import { auth, firestore } from '../../services/firebase/firebase'
-import { collection, getDocs, query, where } from '@firebase/firestore'
-import { PasswordResetModal } from '../../components'
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { FaEye, FaEyeSlash } from 'react-icons/fa6';
+import { signInWithEmailAndPassword } from '@firebase/auth';
+import { auth, firestore } from '../../services/firebase/firebase';
+import { collection, getDocs, query, where } from '@firebase/firestore';
+import { PasswordResetModal } from '../../components';
+import useRedirectIfLoggedIn from '../../hooks/useRedirectIfLoggedIn';
 
 const SignIn = () => {
-    const { user } = useContext(AuthContext)
-    const location = useLocation()
+    const redirect = useRedirectIfLoggedIn();
+    if (redirect) return redirect;
 
-    if (user && location.pathname !== '/') {
-        return <Navigate to={'/'} replace />
-    }
-
-    const [isLoading, setIsLoading] = useState(false)
-    const [isToggled, setIstoggled] = useState(false)
-    const [isOpen, setIsOpen] = useState(false)
+    const [isLoading, setIsLoading] = useState(false);
+    const [isToggled, setIstoggled] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
 
     const [formData, setFormData] = useState({
         email: '',
         password: '',
-    })
+    });
     const [errors, setErrors] = useState({
         email: '',
         password: '',
         common: '',
-    })
+    });
 
     const handleInputChange = (e) => {
-        const { name, value } = e.target
-        setFormData({ ...formData, [name]: value })
-        setErrors({ ...errors, [name]: '' })
-    }
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+        setErrors({ ...errors, [name]: '' });
+    };
 
     const togglePassword = () => {
-        setIstoggled((prev) => !prev)
-    }
+        setIstoggled((prev) => !prev);
+    };
 
     const isValidEmail = (email) => {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-        return emailRegex.test(email)
-    }
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
 
     const isValidPassword = (password) => {
         const passwordRegex =
-            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
-        return passwordRegex.test(password)
-    }
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        return passwordRegex.test(password);
+    };
 
     const handleSignIn = async (e) => {
-        e.preventDefault()
-        setIsLoading(true)
-        setErrors({})
+        e.preventDefault();
+        setIsLoading(true);
+        setErrors({
+            email: '',
+            password: '',
+            common: '',
+        });
 
-        const validationErrors = {}
+        const validationErrors = {};
 
         if (!formData.email.trim()) {
-            validationErrors.email = 'Email is required'
+            validationErrors.email = 'Email is required';
         } else if (!isValidEmail(formData.email)) {
-            validationErrors.email = 'Invalid email format'
+            validationErrors.email = 'Invalid email format';
         }
 
         if (!formData.password.trim()) {
-            validationErrors.password = 'Password is required'
+            validationErrors.password = 'Password is required';
         } else if (!isValidPassword(formData.password)) {
             validationErrors.password =
-                'Password must be at least 8 characters, including at least one uppercase letter, one lowercase letter, one number, and one special character'
+                'Password must be at least 8 characters, including at least one uppercase letter, one lowercase letter, one number, and one special character';
         }
 
         try {
             const accessGrantedUsers = collection(
                 firestore,
                 'accessGrantedUsers'
-            )
+            );
             const rolesQuery = query(
                 accessGrantedUsers,
                 where('email', '==', formData.email)
-            )
-            const rolesSnapshot = await getDocs(rolesQuery)
+            );
+            const rolesSnapshot = await getDocs(rolesQuery);
 
             if (rolesSnapshot.empty) {
                 validationErrors.email =
-                    "You can't sign in with this email. Please contact your Admin"
+                    "You can't sign in with this email. Please contact your Admin";
             }
         } catch (error) {
-            console.error(error)
+            console.error(error);
         }
 
         if (Object.keys(validationErrors).length > 0) {
-            setErrors(validationErrors)
-            setIsLoading(false)
+            setErrors(validationErrors);
+            setIsLoading(false);
         } else {
             try {
                 await signInWithEmailAndPassword(
                     auth,
                     formData.email,
                     formData.password
-                )
-                setFormData({})
+                );
+                setFormData({
+                    email: '',
+                    password: '',
+                });
+                setIsLoading(false);
             } catch (error) {
-                const errorCode = error.code
+                const errorCode = error.code;
 
                 if (errorCode === 'auth/invalid-email') {
                     setErrors((prevErrors) => ({
                         ...prevErrors,
                         email: 'Invalid email address',
-                    }))
+                    }));
                 } else if (errorCode === 'auth/user-not-found') {
                     setErrors((prevErrors) => ({
                         ...prevErrors,
                         email: 'This email is not registered. Please sign up first.',
-                    }))
+                    }));
                 } else if (errorCode === 'auth/wrong-password') {
                     setErrors((prevErrors) => ({
                         ...prevErrors,
                         password: 'Incorrect password',
-                    }))
+                    }));
                 } else {
                     setErrors((prevErrors) => ({
                         ...prevErrors,
                         common: 'An error occurred. Please try again later',
-                    }))
+                    }));
                 }
+                setIsLoading(false);
             }
-            setIsLoading(false)
         }
-    }
+    };
 
     const closeModal = () => {
-        setIsOpen(false)
-    }
+        setIsOpen(false);
+    };
 
     const openModal = () => {
-        setIsOpen(true)
-    }
+        setIsOpen(true);
+    };
 
     return (
         <>
@@ -247,7 +251,7 @@ const SignIn = () => {
             </div>
             <PasswordResetModal isOpen={isOpen} onClose={closeModal} />
         </>
-    )
-}
+    );
+};
 
-export default SignIn
+export default SignIn;
