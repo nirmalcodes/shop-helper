@@ -12,10 +12,10 @@ dist
 dist-ssr
 *.local
 .env
+.env.development
 
 
 # Editor directories and files
-.firebase/*
 .vscode/*
 !.vscode/extensions.json
 .idea
@@ -26,4 +26,4 @@ dist-ssr
 *.sln
 *.sw?
 *.cache
-.env.development
+/.firebase

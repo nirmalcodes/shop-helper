@@ -1,15 +1,16 @@
-import React from 'react';
-import { Navigate } from 'react-router-dom';
-import { UserAuth } from '../../context/AuthContext';
+import React, { useContext } from 'react'
+import { AuthContext } from '../../contexts/AuthContext'
+import { Navigate } from 'react-router-dom'
+import Layout from '../Layout/Layout'
 
 const ProtectedRoute = ({ children }) => {
-    const { user } = UserAuth();
+    const { user } = useContext(AuthContext)
 
     if (!user) {
-        return <Navigate to="/login" />;
+        return <Navigate to={'/signin'} replace />
     }
 
-    return children;
-};
+    return <Layout>{children}</Layout>
+}
 
-export default ProtectedRoute;
+export default ProtectedRoute

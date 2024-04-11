@@ -1,0 +1,113 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type='number'] {
+    -moz-appearance: textfield;
+}
+
+@layer components {
+    .sidebar {
+        @apply fixed left-0 top-0 z-[9999] h-screen w-0 overflow-hidden border-r bg-white transition-all duration-300 ease-in lg:w-[78px];
+    }
+
+    .sidebar.open {
+        @apply w-[78px] lg:w-[240px];
+    }
+
+    .navbar {
+        @apply fixed left-0 right-0 top-0 z-[9999] flex h-14 w-full items-center border-b bg-white px-4 py-3 transition-all duration-300 ease-in lg:left-[78px] lg:w-[calc(100%_-_78px)];
+    }
+
+    .content {
+        @apply absolute left-0 top-[56px] flex min-h-[calc(100vh_-_56px)] w-full flex-col bg-[#FAFBFF] transition-all duration-300 ease-in lg:left-[78px] lg:w-[calc(100%_-_78px)];
+    }
+
+    .sidebar.open ~ .navbar,
+    .sidebar.open ~ .content {
+        @apply left-[78px] w-[calc(100%_-_78px)] lg:left-[240px] lg:w-[calc(100%_-_240px)];
+    }
+
+    .sidebar-link {
+        @apply flex h-[62px] w-[62px] flex-col items-center justify-center gap-1 rounded-md border bg-[#FAFBFF] p-1 text-2xl transition-all duration-300 ease-in hover:bg-indigo-600 hover:text-white hover:shadow-md;
+    }
+
+    .sidebar.open .sidebar-link {
+        @apply w-full lg:h-auto lg:flex-row lg:justify-start lg:gap-2 lg:px-4 lg:py-3;
+    }
+
+    .sidebar-link.active {
+        @apply bg-indigo-600 text-white shadow-md hover:bg-indigo-600/95;
+    }
+
+    .container {
+        @apply mx-auto w-full lg:w-[95%] xl:w-[90%];
+    }
+
+    .form-group {
+        @apply mb-4;
+    }
+
+    .form-label {
+        @apply inline-block h-min;
+    }
+
+    .form-input {
+        @apply block w-full appearance-none rounded-lg border-gray-300 focus:border-indigo-600 focus:ring-indigo-600 disabled:bg-gray-300/30 disabled:text-gray-600;
+    }
+
+    .helper-text {
+        @apply mt-1 block;
+    }
+
+    .error-mssg {
+        @apply text-red-500;
+    }
+
+    .mssg-card {
+        @apply flex max-w-[85%] flex-col gap-[6px];
+    }
+
+    .mssg-txt-card {
+        @apply w-fit rounded-md px-2 py-1 shadow-md;
+    }
+    .mssg-attachment-card {
+        @apply flex w-fit flex-col rounded-md p-1 shadow-md;
+    }
+    .attachment-wrapper {
+        @apply flex w-fit flex-wrap gap-1;
+    }
+
+    .attachment-thumbnail {
+        @apply aspect-square h-[160px] max-w-[100dvh] flex-[1_1_100px] overflow-hidden md:h-[180px] xl:h-[200px];
+    }
+
+    .attachment-thumbnail img {
+        @apply h-full w-full rounded-md bg-gradient-to-tr from-gray-500 to-gray-100 object-cover object-left-top;
+    }
+}
+
+.scroll-area::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+.scroll-area::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* Handle */
+.scroll-area::-webkit-scrollbar-thumb {
+    background: #c0c0c0;
+    border-radius: 5px;
+}
+
+/* Handle on hover */
+.scroll-area::-webkit-scrollbar-thumb:hover {
+    background: #b1b1b1;
+}

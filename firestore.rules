@@ -1,0 +1,61 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    //TODO : remove in future
+    match /configs/configData {
+      allow read: if true;
+      allow write: if request.auth.token.admin == true;
+    }
+
+    match /siteConfigurations/configData {
+      allow read;
+    }
+    
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    function isRoot() {
+      return isSignedIn() && getUserRole() == "root";
+    }
+
+    function isAdmin() {
+      return isSignedIn() && getUserRole() == "admin";
+    }
+
+    function isUser() {
+      return isSignedIn() && getUserRole() == "user";
+    }
+
+    
+    match /accessGrantedUsers/{userId} {
+      allow read;
+      allow write, update, delete: if isSignedIn() && (isRoot() || isAdmin());
+    }
+
+    
+    match /users/{userId} {
+      allow create, read: if isSignedIn();
+      allow create: if request.auth.uid == resource.id; 
+      allow write: if (isRoot() || isAdmin());
+      allow read, write, delete: if isSignedIn() && request.auth.uid == resource.id;
+    }
+
+    match /kokoConfigurations/configData {
+      allow read, write: if isRoot() || isAdmin();
+      allow read: if isUser();
+    }
+    
+    match /messages/{document=**} {
+      allow read: if isUser();
+      allow create, read, write: if isRoot() || isAdmin();
+      allow delete: if (isRoot() || isAdmin()) && resource.data.createdBy == request.auth.email;
+    }
+
+  }
+}
