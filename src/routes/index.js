@@ -48,7 +48,7 @@ const ROUTES = [
         path: '/',
         main: true,
         component: Home,
-        hiddenInSidebar: true,
+        hiddenInSidebar: false,
         children: [],
     },
     {
