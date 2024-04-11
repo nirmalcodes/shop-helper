@@ -16,14 +16,14 @@ const App = () => {
     const [isSiteActive, setIsSiteActive] = useState(true)
 
     const [user, setUser] = useState(
-        sessionStorage.getItem('user')
-            ? JSON.parse(sessionStorage.getItem('user'))
+        localStorage.getItem('user')
+            ? JSON.parse(localStorage.getItem('user'))
             : null
     )
 
     const [userRole, setUserRole] = useState(
-        sessionStorage.getItem('userRole')
-            ? JSON.parse(sessionStorage.getItem('userRole'))
+        localStorage.getItem('userRole')
+            ? JSON.parse(localStorage.getItem('userRole'))
             : null
     )
 
@@ -43,7 +43,7 @@ const App = () => {
 
                 if (docSnap.exists()) {
                     const role = docSnap.data().role
-                    sessionStorage.setItem('userRole', JSON.stringify(role))
+                    localStorage.setItem('userRole', JSON.stringify(role))
                     setUserRole(role)
                 }
             } catch (error) {
