@@ -48,7 +48,7 @@ const ROUTES = [
         path: '/',
         main: true,
         component: Home,
-        hiddenInSidebar: false,
+        hiddenInSidebar: true,
         children: [],
     },
     {
@@ -70,7 +70,7 @@ const ROUTES = [
         path: '/chat',
         main: true,
         component: Chat,
-        hiddenInSidebar: false,
+        hiddenInSidebar: true,
         children: [],
     },
     {
