@@ -13,8 +13,8 @@ export const AuthContext = createContext()
 export const AuthProvider = ({ children }) => {
     // const [user, setUser] = useState(null)
     const [user, setUser] = useState(
-        localStorage.getItem('user')
-            ? JSON.parse(localStorage.getItem('user'))
+        sessionStorage.getItem('user')
+            ? JSON.parse(sessionStorage.getItem('user'))
             : null
     )
 
@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
-            localStorage.setItem('user', JSON.stringify(user))
+            sessionStorage.setItem('user', JSON.stringify(user))
             setUser(user)
         })
 
@@ -72,7 +72,7 @@ export const AuthProvider = ({ children }) => {
     const logOut = async () => {
         try {
             await signOutUser()
-            localStorage.removeItem('user') // Clear user state from localStorage
+            sessionStorage.removeItem('user') // Clear user state from localStorage
             setUser(null)
         } catch (error) {
             // Handle sign-out error
