@@ -11,6 +11,8 @@ node_modules
 dist
 dist-ssr
 *.local
+.env
+.env.development
 
 
 # Editor directories and files
@@ -24,6 +26,4 @@ dist-ssr
 *.sln
 *.sw?
 *.cache
-.env
-.env.development
-.firebase/
+/.firebase
