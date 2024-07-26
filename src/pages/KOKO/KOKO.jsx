@@ -40,12 +40,12 @@ const KOKO = () => {
 
     const [errors, setErrors] = useState({
         productPriceError: '',
-        deliveryFeeError: '',
+        courierFeeError: '',
     })
 
     const [formData, setFormData] = useState({
         productPrice: '',
-        deliveryFee: '',
+        courierFee: '',
         discount: '',
         discountedPrice: '',
         convenienceFee: '',
@@ -55,7 +55,7 @@ const KOKO = () => {
 
     const [calculatedData, setCalculatedData] = useState({
         productPrice: '',
-        deliveryFee: '',
+        courierFee: '',
         discount: '',
         discountedPrice: '',
         convenienceFee: '',
@@ -81,7 +81,7 @@ const KOKO = () => {
 
         // Convert all relevant form data values to numbers
         const productPrice = parseFloat(formData.productPrice)
-        const deliveryFee = parseFloat(formData.deliveryFee) || 0 // Default to 0 if deliveryFee is not provided
+        const courierFee = parseFloat(formData.courierFee) || 0 // Default to 0 if courierFee is not provided
 
         // Define constants
         let convenienFeePercentage = (100 - convenienceRate) / 100
@@ -101,22 +101,22 @@ const KOKO = () => {
             }))
             return
         }
-        if (isNaN(deliveryFee) || deliveryFee < 0) {
+        if (isNaN(courierFee) || courierFee < 0) {
             setErrors((prevErrors) => ({
                 ...prevErrors,
-                deliveryFeeError: 'Invalid Delivery Fee.',
+                courierFeeError: 'Invalid Courier Fee.',
             }))
             return
         }
 
         // Calculate values
-        const priceWithDelivery = productPrice + deliveryFee
+        const priceWithCourier = productPrice + courierFee
 
         const totalWithConvenienceFee =
-            priceWithDelivery / convenienFeePercentage
+            priceWithCourier / convenienFeePercentage
 
         const calculatedConvenienceFee =
-            totalWithConvenienceFee - priceWithDelivery
+            totalWithConvenienceFee - priceWithCourier
 
         const installmentPerMonth = totalWithConvenienceFee / 3
 
@@ -135,7 +135,7 @@ const KOKO = () => {
         // Set clipboard text
         setCalculatedData({
             productPrice,
-            deliveryFee,
+            courierFee,
             convenienceFee: parseFloat(fixedCFee),
             totalWithConvenienceFee: parseFloat(fixedTotWCFee),
             installmentPerMonth: parseFloat(fixedInsPerMonth),
@@ -151,7 +151,7 @@ const KOKO = () => {
 
         // Convert all relevant form data values to numbers
         const productPrice = parseFloat(formData.productPrice)
-        const deliveryFee = parseFloat(formData.deliveryFee) || 0 // Default to 0 if deliveryFee is not provided
+        const courierFee = parseFloat(formData.courierFee) || 0 // Default to 0 if courierFee is not provided
 
         let convenienFeePercentage = (100 - convenienceRate) / 100
 
@@ -172,10 +172,10 @@ const KOKO = () => {
             }))
             return
         }
-        if (isNaN(deliveryFee) || deliveryFee < 0) {
+        if (isNaN(courierFee) || courierFee < 0) {
             setErrors((prevErrors) => ({
                 ...prevErrors,
-                deliveryFeeError: 'Invalid Delivery Fee.',
+                courierFeeError: 'Invalid Courier Fee.',
             }))
             return
         }
@@ -194,13 +194,13 @@ const KOKO = () => {
             discountedPrice = productPrice - clacDiscount
         }
 
-        const priceWithDelivery = discountedPrice + deliveryFee
+        const priceWithCourier = discountedPrice + courierFee
 
         const totalWithConvenienceFee =
-            priceWithDelivery / convenienFeePercentage
+            priceWithCourier / convenienFeePercentage
 
         const calculatedConvenienceFee =
-            totalWithConvenienceFee - priceWithDelivery
+            totalWithConvenienceFee - priceWithCourier
 
         const installmentPerMonth = totalWithConvenienceFee / 3
 
@@ -225,7 +225,7 @@ const KOKO = () => {
         // Set clipboard text
         setCalculatedData({
             productPrice,
-            deliveryFee,
+            courierFee,
             discount: parseFloat(fixedDiscount),
             discountedPrice: parseFloat(fixedDiscountedPrice),
             convenienceFee: parseFloat(fixedCFee),
@@ -239,23 +239,23 @@ const KOKO = () => {
 
     // Function for copy to clipboard (old way)
     const handleCopyToClipboard = () => {
-        const deliveryFee = parseFloat(formData.deliveryFee)
+        const courierFee = parseFloat(formData.courierFee)
 
         let calculatedDataText
 
         if (isDiscounted) {
-            // Validate delivery fee
-            if (isNaN(deliveryFee)) {
+            // Validate Courier Fee
+            if (isNaN(courierFee)) {
                 calculatedDataText = `Product Price: Rs. ${calculatedData.productPrice}/=\nDiscount: Rs. ${calculatedData.discount}/=\nDiscounted Price: Rs. ${calculatedData.discountedPrice}/=\nConvenience Fee: Rs. ${calculatedData.convenienceFee}/=\nTotal with Convenience Fee: Rs. ${calculatedData.totalWithConvenienceFee}/=\nInstallment Per Month: Rs. ${calculatedData.installmentPerMonth}/=`
             } else {
-                calculatedDataText = `Product Price: Rs. ${calculatedData.productPrice}/=\nDelivery Fee: Rs. ${calculatedData.deliveryFee}/=\nDiscount: Rs. ${calculatedData.discount}/=\nDiscounted Price: Rs. ${calculatedData.discountedPrice}/=\nConvenience Fee: Rs. ${calculatedData.convenienceFee}/=\nTotal with Convenience Fee: Rs. ${calculatedData.totalWithConvenienceFee}/=\nInstallment Per Month: Rs. ${calculatedData.installmentPerMonth}/=`
+                calculatedDataText = `Product Price: Rs. ${calculatedData.productPrice}/=\nCourier Fee: Rs. ${calculatedData.courierFee}/=\nDiscount: Rs. ${calculatedData.discount}/=\nDiscounted Price: Rs. ${calculatedData.discountedPrice}/=\nConvenience Fee: Rs. ${calculatedData.convenienceFee}/=\nTotal with Convenience Fee: Rs. ${calculatedData.totalWithConvenienceFee}/=\nInstallment Per Month: Rs. ${calculatedData.installmentPerMonth}/=`
             }
         } else {
-            // Validate delivery fee
-            if (isNaN(deliveryFee)) {
+            // Validate Courier Fee
+            if (isNaN(courierFee)) {
                 calculatedDataText = `Product Price: Rs. ${calculatedData.productPrice}/=\nConvenience Fee: Rs. ${calculatedData.convenienceFee}/=\nTotal with Convenience Fee: Rs. ${calculatedData.totalWithConvenienceFee}/=\nInstallment Per Month: Rs. ${calculatedData.installmentPerMonth}/=`
             } else {
-                calculatedDataText = `Product Price: Rs. ${calculatedData.productPrice}/=\nDelivery Fee: Rs. ${calculatedData.deliveryFee}/=\nConvenience Fee: Rs. ${calculatedData.convenienceFee}/=\nTotal with Convenience Fee: Rs. ${calculatedData.totalWithConvenienceFee}/=\nInstallment Per Month: Rs. ${calculatedData.installmentPerMonth}/=`
+                calculatedDataText = `Product Price: Rs. ${calculatedData.productPrice}/=\nCourier Fee: Rs. ${calculatedData.courierFee}/=\nConvenience Fee: Rs. ${calculatedData.convenienceFee}/=\nTotal with Convenience Fee: Rs. ${calculatedData.totalWithConvenienceFee}/=\nInstallment Per Month: Rs. ${calculatedData.installmentPerMonth}/=`
             }
         }
 
@@ -349,24 +349,24 @@ const KOKO = () => {
 
                     <div className="form-group flex-wrap md:flex">
                         <label
-                            htmlFor="deliveryFee"
+                            htmlFor="courierFee"
                             className="form-label mb-2 text-sm font-medium text-slate-700 md:mb-0 md:w-1/3 md:px-4"
                         >
-                            Delivery Fee
+                            Courier Fee
                         </label>
                         <div className="md:w-4/6 md:px-4">
                             <NumberInput
-                                name="deliveryFee"
-                                id="deliveryFee"
-                                placeholder="Enter Delivery Fee"
+                                name="courierFee"
+                                id="courierFee"
+                                placeholder="Enter Courier Fee"
                                 autoComplete="off"
                                 className="form-input"
-                                value={formData.deliveryFee}
+                                value={formData.courierFee}
                                 onChange={handleInputChange}
                             />
-                            {errors.deliveryFeeError && (
+                            {errors.courierFeeError && (
                                 <span className="helper-text error-mssg text-sm font-medium">
-                                    {errors.deliveryFeeError}
+                                    {errors.courierFeeError}
                                 </span>
                             )}
                         </div>
