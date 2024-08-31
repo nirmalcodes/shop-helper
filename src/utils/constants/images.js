@@ -1,6 +1,6 @@
 import BackgroundImg from '/background_shapes.jpg'
 import KokoLogo from '/koko_logo.png'
-import ShopHelperLogo from '/shop-helper-logo.png'
+import ShopHelperLogo from '/masked-icon.png'
 
 export default {
     BackgroundImg,
