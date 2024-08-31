@@ -19,17 +19,6 @@
         "destination": "/index.html"
       }
     ],
-    "headers": [
-      {
-        "source": "**/*.@(jpg|jpeg|gif|png|js|css)",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "max-age=7200"
-          }
-        ]
-      }
-    ],
     "frameworksBackend": {
       "region": "asia-east1"
     }
