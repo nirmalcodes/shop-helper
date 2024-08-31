@@ -1,5 +1,6 @@
 import React from 'react'
 import { Helmet } from 'react-helmet-async'
+import { images } from '../../utils/constants'
 
 const SiteDisabled = () => {
     return (
@@ -25,7 +26,7 @@ const SiteDisabled = () => {
                     </div>
                     <div className="">
                         <img
-                            src="/shop-helper-logo.png"
+                            src={images.ShopHelperLogo}
                             alt="Shop Helper"
                             loading="eager"
                             width={128}

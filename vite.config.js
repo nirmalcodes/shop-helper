@@ -1,3 +1,4 @@
+// Updated vite.config.js
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import { VitePWA } from 'vite-plugin-pwa'
@@ -12,6 +13,8 @@ export default defineConfig({
                 'favicon.ico',
                 'apple-touch-icon.png',
                 'masked-icon.png',
+                'background_shapes.jpg', // Add any other static assets here
+                'koko_logo.png',
             ],
             manifest: {
                 name: 'Shop Helper',
@@ -19,28 +22,28 @@ export default defineConfig({
                 description: 'Website to help shop owners',
                 icons: [
                     {
-                        src: '/android-chrome-192x192.png',
+                        src: 'android-chrome-192x192.png',
                         sizes: '192x192',
                         type: 'image/png',
-                        purpose: 'favicon',
+                        purpose: 'any', // Set a valid purpose
                     },
                     {
-                        src: '/android-chrome-512x512.png',
+                        src: 'android-chrome-512x512.png',
                         sizes: '512x512',
                         type: 'image/png',
-                        purpose: 'favicon',
+                        purpose: 'any', // Set a valid purpose
                     },
                     {
-                        src: '/apple-touch-icon.png',
+                        src: 'apple-touch-icon.png',
                         sizes: '180x180',
                         type: 'image/png',
-                        purpose: 'apple touch icon',
+                        purpose: 'maskable', // Use a valid purpose like 'maskable' if needed
                     },
                     {
-                        src: '/masked-icon.png',
+                        src: 'masked-icon.png',
                         sizes: '512x512',
                         type: 'image/png',
-                        purpose: 'any maskable',
+                        purpose: 'maskable', // Use a valid purpose like 'maskable'
                     },
                 ],
                 theme_color: '#3252FA',
@@ -49,6 +52,22 @@ export default defineConfig({
                 scope: '/',
                 start_url: '/',
                 orientation: 'portrait',
+            },
+            workbox: {
+                runtimeCaching: [
+                    {
+                        urlPattern: ({ request }) =>
+                            request.destination === 'image',
+                        handler: 'CacheFirst',
+                        options: {
+                            cacheName: 'images',
+                            expiration: {
+                                maxEntries: 20,
+                                maxAgeSeconds: 30 * 24 * 60 * 60, // 30 Days
+                            },
+                        },
+                    },
+                ],
             },
         }),
     ],

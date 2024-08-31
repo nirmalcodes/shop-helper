@@ -1,11 +1,12 @@
 import React from 'react'
+import { images } from '../../utils/constants'
 
 const Loader = () => {
     return (
         <div className="flex min-h-[100dvh] items-center justify-center bg-black/40 text-white">
             <div className="">
                 <img
-                    src="/shop-helper-logo.png"
+                    src={images.ShopHelperLogo}
                     alt="Shop Helper"
                     loading="eager"
                     width={120}

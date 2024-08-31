@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import { firestore } from '../../services/firebase/firebase'
 import { doc, onSnapshot } from '@firebase/firestore'
 import { Helmet } from 'react-helmet-async'
+import { images } from '../../utils/constants'
 
 const KOKO = () => {
     const [convenienceRate, setConvenienceRate] = useState(0)
@@ -306,7 +307,7 @@ const KOKO = () => {
                     {/* Logo and Calc Status */}
                     <div className="mb-5 flex items-center">
                         <img
-                            src={'/koko_logo.png'}
+                            src={images.KokoLogo}
                             alt="KOKO Logo"
                             loading="lazy"
                             width={128}

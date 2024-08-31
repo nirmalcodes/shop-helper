@@ -1,7 +1,9 @@
-import backgroundImg from '../../assets/images/background_shapes.jpg'
-import kokoLogo from '../../assets/images/koko_logo.png'
+import BackgroundImg from '/background_shapes.jpg'
+import KokoLogo from '/koko_logo.png'
+import ShopHelperLogo from '/masked-icon.png'
 
 export default {
-    backgroundImg,
-    kokoLogo,
+    BackgroundImg,
+    KokoLogo,
+    ShopHelperLogo,
 }

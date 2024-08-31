@@ -4,6 +4,7 @@ import { RoutesContext } from '../../../contexts/RoutesContext'
 import { AuthContext } from '../../../contexts/AuthContext'
 import { firestore } from '../../../services/firebase/firebase'
 import { doc, getDoc } from '@firebase/firestore'
+import { images } from '../../../utils/constants'
 
 const Sidebar = ({ open = true, toggleOpen }) => {
     const { routes } = useContext(RoutesContext)
@@ -40,7 +41,7 @@ const Sidebar = ({ open = true, toggleOpen }) => {
             <aside className={`sidebar ${open && 'open'}`}>
                 <div className="flex h-14 flex-shrink-0 items-center justify-center gap-x-3 border-b p-2 text-4xl">
                     <img
-                        src="/shop-helper-logo.png"
+                        src={images.ShopHelperLogo}
                         alt="Shop Helper"
                         loading="eager"
                         width={44}
