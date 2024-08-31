@@ -1,3 +1,4 @@
+// Updated vite.config.js
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import { VitePWA } from 'vite-plugin-pwa'
@@ -21,28 +22,28 @@ export default defineConfig({
                 description: 'Website to help shop owners',
                 icons: [
                     {
-                        src: 'android-chrome-192x192.png', // Remove leading '/'
+                        src: 'android-chrome-192x192.png',
                         sizes: '192x192',
                         type: 'image/png',
-                        purpose: 'favicon',
+                        purpose: 'any', // Set a valid purpose
                     },
                     {
-                        src: 'android-chrome-512x512.png', // Remove leading '/'
+                        src: 'android-chrome-512x512.png',
                         sizes: '512x512',
                         type: 'image/png',
-                        purpose: 'favicon',
+                        purpose: 'any', // Set a valid purpose
                     },
                     {
-                        src: 'apple-touch-icon.png', // Remove leading '/'
+                        src: 'apple-touch-icon.png',
                         sizes: '180x180',
                         type: 'image/png',
-                        purpose: 'apple touch icon',
+                        purpose: 'maskable', // Use a valid purpose like 'maskable' if needed
                     },
                     {
-                        src: 'masked-icon.png', // Remove leading '/'
+                        src: 'masked-icon.png',
                         sizes: '512x512',
                         type: 'image/png',
-                        purpose: 'any maskable',
+                        purpose: 'maskable', // Use a valid purpose like 'maskable'
                     },
                 ],
                 theme_color: '#3252FA',

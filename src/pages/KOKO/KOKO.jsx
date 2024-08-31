@@ -307,7 +307,7 @@ const KOKO = () => {
                     {/* Logo and Calc Status */}
                     <div className="mb-5 flex items-center">
                         <img
-                            src={images.kokoLogo}
+                            src={images.KokoLogo}
                             alt="KOKO Logo"
                             loading="lazy"
                             width={128}
